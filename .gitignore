@@ -1,0 +1,14 @@
+target/
+test-output/
+.tools/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+*.log
+.DS_Store
+Thumbs.db
+
+# Secrets — copy from config.example.properties locally
+src/test/resources/config.properties

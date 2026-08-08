@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="PaymaxAutomationSuite" verbose="1">
+    <parameter name="browser" value="chrome"/>
+
+    <test name="Login Tests">
+        <classes>
+            <class name="com.paymax.automation.tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <test name="Patient Admission Tests">
+        <classes>
+            <class name="com.paymax.automation.tests.PatientAdmissionTests"/>
+        </classes>
+    </test>
+
+    <test name="Patient Action Bar Tests">
+        <classes>
+            <class name="com.paymax.automation.tests.PatientActionBarTests"/>
+        </classes>
+    </test>
+
+    <test name="Outpatient Cycle Tests">
+        <classes>
+            <class name="com.paymax.automation.tests.OutpatientCycleTests"/>
+        </classes>
+    </test>
+</suite>
