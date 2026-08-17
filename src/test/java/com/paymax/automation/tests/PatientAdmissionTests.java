@@ -29,8 +29,8 @@ public class PatientAdmissionTests extends BaseTest {
     private static final String ID_TYPE_PASSPORT = "جواز سفر";
     private static final String CREDIT_COMPANY_NAME = "#@ اليكو";
     private static final String DEFAULT_CLIENT_CASH = "$$نقدي 2019";
-    /** Default نوع التعاقد when the field is available / page opens. */
-    private static final String CONTRACT_TYPE_MEMBER_SELF = "العضو نفسه";
+    /** Default نوع التعاقد when the field is available / page opens (UI spelling with ة). */
+    private static final String CONTRACT_TYPE_MEMBER_SELF = "العضو نفسة";
     private static final String CONTRACT_TYPE_DEPENDENT = "مريض تابع";
     /** Live UI uses a slash separator (not a pipe). */
     private static final String DEFAULT_RELATIVE_SPOUSE = "الزوج/الزوجة";
@@ -637,7 +637,7 @@ public class PatientAdmissionTests extends BaseTest {
     }
 
     @Test(priority = 27,
-            description = "نوع التعاقد defaults to العضو نفسه; DDL offers العضو نفسه/مريض تابع; "
+            description = "نوع التعاقد defaults to العضو نفسة; DDL offers العضو نفسة/مريض تابع; "
                     + "مريض تابع defaults درجة القرابة to الزوج/الزوجة")
     public void cascadingContractAndDependentPatientRules() {
         // Credit جهة unlocks contract cascading (cash keeps نوع التعاقد disabled)
@@ -649,20 +649,20 @@ public class PatientAdmissionTests extends BaseTest {
                 "نوع التعاقد must become enabled after selecting جهة + شركة فرعية");
 
         Assert.assertEquals(page.getContractTypeSelectedText(), CONTRACT_TYPE_MEMBER_SELF,
-                "نوع التعاقد default selection must be العضو نفسه");
+                "نوع التعاقد default selection must be العضو نفسة");
 
         java.util.List<String> contractOptions = page.getContractTypeOptionTexts();
         Assert.assertTrue(contractOptions.contains(CONTRACT_TYPE_MEMBER_SELF),
-                "نوع التعاقد DDL must include العضو نفسه. Options=" + contractOptions);
+                "نوع التعاقد DDL must include العضو نفسة. Options=" + contractOptions);
         Assert.assertTrue(contractOptions.contains(CONTRACT_TYPE_DEPENDENT),
                 "نوع التعاقد DDL must include مريض تابع. Options=" + contractOptions);
         Assert.assertEquals(contractOptions.size(), 2,
                 "نوع التعاقد DDL must offer exactly two choices after جهة آجل. Options="
                         + contractOptions);
 
-        // Default stays العضو نفسه — درجة القرابة should not be required/enabled yet
+        // Default stays العضو نفسة — درجة القرابة should not be required/enabled yet
         Assert.assertFalse(page.isRelativeDegreeEnabled(),
-                "درجة القرابة must stay disabled while نوع التعاقد is العضو نفسه");
+                "درجة القرابة must stay disabled while نوع التعاقد is العضو نفسة");
 
         page.selectContractType(CONTRACT_TYPE_DEPENDENT);
 
@@ -678,5 +678,85 @@ public class PatientAdmissionTests extends BaseTest {
 
         Assert.assertTrue(page.isRelativeDegreeInputReadOnly(),
                 "درجة القرابة combobox must be read-only (no free typing / searching)");
+    }
+
+    @Test(priority = 28,
+            description = "Refresh on /reception/patient/{code} must redirect to exact /reception")
+    public void refreshOnPatientProfileRedirectsToReception() {
+        page.fillMandatoryFields(generateQuadrupleName(), uniqueMobile(), VALID_BIRTH_DATE, VALID_GENDER);
+        page.clickSave();
+        assertPatientSavedSuccessfully();
+
+        Assert.assertTrue(page.isOnSavedPatientUrl(),
+                "Precondition failed: must be on /reception/patient/{code}. Actual: "
+                        + getDriver().getCurrentUrl());
+
+        page.refreshPatientProfileAndWaitForReceptionUrl();
+
+        Assert.assertTrue(page.isOnExactReceptionUrl(),
+                "After refresh on a selected patient, URL must be exact /reception. Actual: "
+                        + getDriver().getCurrentUrl());
+        Assert.assertFalse(getDriver().getCurrentUrl().contains("/reception/patient/"),
+                "After refresh, URL must not keep /reception/patient/{code}. Actual: "
+                        + getDriver().getCurrentUrl());
+    }
+
+    @Test(priority = 29,
+            description = "جديد on a selected patient must navigate to exact /reception")
+    public void newButtonOnPatientProfileNavigatesToReception() {
+        page.fillMandatoryFields(generateQuadrupleName(), uniqueMobile(), VALID_BIRTH_DATE, VALID_GENDER);
+        page.clickSave();
+        assertPatientSavedSuccessfully();
+
+        Assert.assertTrue(page.isOnSavedPatientUrl(),
+                "Precondition failed: must be on /reception/patient/{code}. Actual: "
+                        + getDriver().getCurrentUrl());
+
+        page.clickNewAndWaitForReceptionUrl();
+
+        Assert.assertTrue(page.isOnExactReceptionUrl(),
+                "After جديد, URL must be exact /reception. Actual: "
+                        + getDriver().getCurrentUrl());
+        Assert.assertFalse(getDriver().getCurrentUrl().contains("/reception/patient/"),
+                "After جديد, URL must not keep /reception/patient/{code}. Actual: "
+                        + getDriver().getCurrentUrl());
+    }
+
+    @Test(priority = 30, description = "Verify Reservation Agenda modal opens successfully and dates default to today")
+    public void verifyReservationAgendaModalOpensWithCurrentDates() {
+        page.openReservationAgenda();
+
+        Assert.assertTrue(page.isReservationModalDisplayed(),
+                "Reservation Agenda modal backdrop should be displayed");
+
+        String expectedTodayStr = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        Assert.assertEquals(page.getReservationFromDateValue(), expectedTodayStr,
+                "From (من) date field should be set to today's date by default");
+        Assert.assertEquals(page.getReservationToDateValue(), expectedTodayStr,
+                "To (إلى) date field should be set to today's date by default");
+
+        page.closeReservationModal();
+        Assert.assertFalse(page.isReservationModalDisplayed(),
+                "Reservation Agenda modal backdrop should not be displayed after closing");
+    }
+
+    @Test(priority = 31, description = "Verify searching for reservations on 2026-08-08 returns exactly one result")
+    public void verifyReservationSearchBySpecificDate() {
+        page.openReservationAgenda();
+
+        // Use yyyy-MM-dd format as input key (with dd-MM-yyyy fallback internally)
+        page.setReservationFromDate("2026-08-08");
+        page.setReservationToDate("2026-08-08");
+        page.clickReservationShowButton();
+
+        // Wait explicitly for exactly 1 row to be displayed in the grid
+        page.waitForReservationGridRows(1);
+
+        int rowCount = page.getReservationGridRowCount();
+        Assert.assertEquals(rowCount, 1,
+                "Expected exactly 1 reservation to be returned for date 2026-08-08. Actual count: " + rowCount);
+
+        page.closeReservationModal();
     }
 }

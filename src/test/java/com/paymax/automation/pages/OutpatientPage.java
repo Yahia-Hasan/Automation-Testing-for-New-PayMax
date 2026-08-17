@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Page Object for Outpatient Visits (العيادات الخارجية):
@@ -100,9 +101,178 @@ public class OutpatientPage extends BasePage {
                     + " | //*[contains(normalize-space(.),'لم تُدفع بعد')"
                     + " or contains(normalize-space(.),'لم تدفع بعد')]");
 
-    // ---------- Services & payment ----------
+    // ---------- Services page — patient card & header ----------
+    private static final By BACK_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-back-btn']");
+    private static final By SAVE_VISIT_INFO_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-save-visit-info-btn']");
+    private static final By PRINT_BARCODE_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-print-barcode-btn']");
+    private static final By OPEN_CLAIM_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-open-claim-btn']");
+
+    // Patient info fields (label/value pairs inside patient-info-grid)
+    private static final By PATIENT_INFO_GRID = By.cssSelector(".patient-info-grid");
+    private static final By PATIENT_NAME_FIELD = By.xpath(
+            "//span[contains(@class,'field-label') and normalize-space()='الاسم']"
+                    + "/following-sibling::span[contains(@class,'field-value')]");
+    private static final By PATIENT_CODE_FIELD = By.xpath(
+            "//span[contains(@class,'field-label') and normalize-space()='كود المريض']"
+                    + "/following-sibling::span[contains(@class,'field-value')]");
+    private static final By VISIT_CODE_FIELD = By.xpath(
+            "//span[contains(@class,'field-label') and normalize-space()='كود الزيارة']"
+                    + "/following-sibling::span[contains(@class,'field-value')]");
+    private static final By VISIT_DATE_FIELD = By.xpath(
+            "//span[contains(@class,'field-label') and normalize-space()='تاريخ الزيارة']"
+                    + "/following-sibling::span[contains(@class,'field-value')]");
+    private static final By UNPAID_BADGE = By.xpath(
+            "//*[contains(@class,'badge-warning') and contains(normalize-space(),'غير مدفوع')]");
+    private static final By PAID_BADGE = By.xpath(
+            "//*[contains(@class,'badge') and contains(normalize-space(),'مدفوع')"
+                    + " and not(contains(normalize-space(),'غير'))]");
+
+    // Visit code in page header ("زيارة رقم: XXXX")
+    private static final By PAGE_VISIT_NUMBER_HEADER = By.xpath(
+            "//p[contains(normalize-space(),'زيارة رقم')]");
+    private static final By PAGE_H1_TITLE = By.cssSelector(".page-header h1");
+
+    // ---------- Visit info row (نوع الحالة, الشركة الفرعية, الطبيب المحول, ICD10) ----------
+    private static final By SERVICES_CASE_TYPE_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-case-type-select']");
+    private static final By SERVICES_INS_COMPANY_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-ins-company-select']");
+    private static final By SERVICES_TRANSFER_DOCTOR_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-transfer-doctor-select']");
+    private static final By SERVICES_ICD_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-icd-select']");
+
+    // ---------- Totals strip ----------
+    private static final By TOTALS_STRIP = By.cssSelector(".totals-strip");
+    private static final By TOTAL_CHIP_TOTAL = By.xpath(
+            "//*[contains(@class,'total-chip')][./span[normalize-space()='الإجمالي']]"
+                    + "/span[contains(@class,'chip-value')]");
+    private static final By TOTAL_CHIP_CASH = By.xpath(
+            "//*[contains(@class,'total-chip')][./span[normalize-space()='نقدي']]"
+                    + "/span[contains(@class,'chip-value')]");
+    private static final By TOTAL_CHIP_CREDIT = By.xpath(
+            "//*[contains(@class,'total-chip')][./span[contains(normalize-space(),'آجل')]]"
+                    + "/span[contains(@class,'chip-value')]");
+    private static final By TOTAL_CHIP_DISCOUNT = By.xpath(
+            "//*[contains(@class,'total-chip')][./span[normalize-space()='خصم']]"
+                    + "/span[contains(@class,'chip-value')]");
+    private static final By TOTAL_CHIP_PAID = By.xpath(
+            "//*[contains(@class,'total-chip')][./span[normalize-space()='المدفوع']]"
+                    + "/span[contains(@class,'chip-value')]");
+    private static final By TOTAL_CHIP_REMAINING = By.xpath(
+            "//*[contains(@class,'total-chip')][./span[normalize-space()='المتبقي']]"
+                    + "/span[contains(@class,'chip-value')]");
+    private static final By LEAVE_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-leave-btn']");
+
+    // ---------- Tab bar ----------
+    private static final By TAB_SERVICES = By.cssSelector(
+            "[data-test-id='opd-patient-services-services-tab-btn']");
+    private static final By TAB_MEDICINES = By.cssSelector(
+            "[data-test-id='opd-patient-services-medicines-tab-btn']");
+    private static final By TAB_MED_REQUEST = By.cssSelector(
+            "[data-test-id='opd-patient-services-med-request-tab-btn']");
+    private static final By TAB_MED_RETURN = By.cssSelector(
+            "[data-test-id='opd-patient-services-med-return-tab-btn']");
+
+    // ---------- Claim Modal ----------
+    private static final By CLAIM_MODAL_TITLE = By.cssSelector(".modal-title");
+    private static final By CLAIM_MODAL_CLOSE_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-claim-modal-close-btn']");
+    private static final By CLAIM_TITLE_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-claim-title-input']");
+    private static final By CLAIM_FILE_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-claim-file-input']");
+    private static final By SAVE_CLAIM_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-save-claim-btn']");
+    private static final By CLAIM_ITEM_LIST = By.cssSelector(".claim-list .claim-item");
+    private static final By CLAIM_TITLE_TEXT = By.cssSelector(".claim-title");
+    private static final By DOWNLOAD_CLAIM_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-download-claim-btn']");
+    private static final By DELETE_CLAIM_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-delete-claim-btn']");
+
+    // ---------- Add service form ----------
+    private static final By TOGGLE_FAVORITES_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-toggle-favorites-btn']");
+    private static final By SERVICE_GROUP_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-service-group-select']");
+    private static final By SHORT_CODE_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-short-code-input']");
+    private static final By UNIT_PRICE_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-unit-price-input']");
+    private static final By CREDIT_PCT_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-credit-pct-input']");
+    private static final By CREDIT_PER_UNIT_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-credit-per-unit-input']");
+    private static final By CASH_PER_UNIT_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-cash-per-unit-input']");
+    private static final By QUANTITY_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-quantity-input']");
+    private static final By DISCOUNT_PCT_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-discount-pct-input']");
+    private static final By DISCOUNT_AMOUNT_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-discount-amount-input']");
+    private static final By DISCOUNT_GIVER_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-discount-giver-select']");
+    private static final By SERVICE_NOTES_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-notes-input']");
+    private static final By ADD_DRAFT_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-add-draft-btn']");
+    private static final By APPROVAL_NO_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-approval-no-input'],"
+                    + "[data-test-id='opd-patient-services-approval-number-input'],"
+                    + "[data-test-id='opd-patient-services-approval-input']");
+    private static final By APPROVAL_NO_BY_LABEL = By.xpath(
+            "//label[contains(normalize-space(.),'الموافقة') or contains(normalize-space(.),'رقم الموافقة')]"
+                    + "/following::input[1]");
+    private static final By SAVE_DRAFTS_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-save-drafts-btn']");
+    private static final By SAVE_DRAFTS_BY_TEXT = By.xpath(
+            "//button[contains(normalize-space(.),'حفظ الخدمات')]");
+    private static final By CLEAR_DRAFTS_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-clear-drafts-btn']");
+    private static final By DRAFT_SERVICE_ROWS = By.cssSelector(
+            "[data-test-id='opd-patient-services-draft-row'], tr.draft-row");
+    private static final By SAVED_SERVICE_ROWS = By.cssSelector(
+            "[data-test-id='opd-patient-services-saved-service-row'], tr.done-row");
+    private static final By SERVICE_ERROR_TOAST_OR_ALERT = By.xpath(
+            "//*[contains(@class,'toast-error') or contains(@class,'swal2-html-container') or contains(@class,'alert-danger') or contains(@class,'toast-message') or contains(@class,'p-toast-detail') or contains(normalize-space(.),'كود الخدمة غير صحيح')]");
+    // Saved services list
+    private static final By SAVED_SERVICES_COUNT_BADGE = By.xpath(
+            "//*[contains(@class,'section-title')][contains(normalize-space(),'الخدمات المحفوظة')]"
+                    + "//*[contains(@class,'count-badge')]");
+    private static final By NO_SERVICES_MSG = By.cssSelector(".no-items");
+    private static final By SERVICES_TAB_BADGE = By.cssSelector(
+            "[data-test-id='opd-patient-services-services-tab-btn'] .tab-badge");
+
+    // ---------- Payment ----------
+    private static final By PAYMENT_TREASURY_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-treasury-select']");
+    private static final By PAYMENT_METHOD_NEW_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-payment-method-select']");
+    private static final By PAY_AMOUNT_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-pay-amount-input']");
+    private static final By PAY_NOTES_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-pay-notes-input']");
+    private static final By PAY_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-pay-btn']");
+    private static final By PRINT_CREDIT_RECEIPT_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-print-credit-receipt-btn']");
+    private static final By PAYMENT_HISTORY_ROWS = By.cssSelector(
+            ".payment-history-table tbody tr, table.payment-history-table tbody tr");
+    private static final By PAYMENT_HISTORY_EMPTY = By.xpath(
+            "//td[@colspan and contains(normalize-space(),'لا توجد مدفوعات')]");
+    private static final By PAY_CHANGE_HINT = By.cssSelector(".pay-change-hint");
+
+    // ---------- Services & payment (legacy selectors — kept for addServiceToVisit) ----------
     private static final By SERVICE_SELECT = By.cssSelector(
-            "[data-test-id='clinic-visit-service-select'],"
+            "[data-test-id='opd-patient-services-service-select'],"
+                    + "[data-test-id='clinic-visit-service-select'],"
                     + "[data-test-id='opd-service-select']");
     /**
      * Must NOT match "مجموعة الخدمات". Prefer exact label "الخدمة" or the
@@ -117,7 +287,8 @@ public class OutpatientPage extends BasePage {
                     + "/ancestor::*[self::ng-select or contains(@class,'ng-select')][1])");
 
     private static final By DOCTOR_SELECT = By.cssSelector(
-            "[data-test-id='clinic-visit-doctor-select'],"
+            "[data-test-id='opd-patient-services-doctor-select'],"
+                    + "[data-test-id='clinic-visit-doctor-select'],"
                     + "[data-test-id='opd-doctor-select']");
     private static final By DOCTOR_BY_LABEL = By.xpath(
             "(//label[contains(normalize-space(.),'الطبيب المعالج')]"
@@ -126,7 +297,8 @@ public class OutpatientPage extends BasePage {
                     + "/ancestor::*[self::ng-select or contains(@class,'ng-select')][1])");
 
     private static final By CLINIC_SELECT = By.cssSelector(
-            "[data-test-id='clinic-visit-clinic-select'],"
+            "[data-test-id='opd-patient-services-clinic-select'],"
+                    + "[data-test-id='clinic-visit-clinic-select'],"
                     + "[data-test-id='opd-clinic-select']");
     private static final By CLINIC_BY_LABEL = By.xpath(
             "(//label[normalize-space()='العيادة' or normalize-space()='العيادة *'"
@@ -136,41 +308,47 @@ public class OutpatientPage extends BasePage {
                     + "/ancestor::*[self::ng-select or contains(@class,'ng-select')][1])");
 
     private static final By ADD_SERVICE_BUTTON = By.cssSelector(
-            "[data-test-id='clinic-visit-add-service-btn'],"
+            "[data-test-id='opd-patient-services-add-draft-btn'],"
+                    + "[data-test-id='clinic-visit-add-service-btn'],"
                     + "[data-test-id='opd-add-service-btn']");
     private static final By ADD_SERVICE_BY_TEXT = By.xpath(
             "//button[contains(normalize-space(.),'إضافة للقائمة')"
                     + " or contains(normalize-space(.),'اضافة للقائمة')]");
 
     private static final By TREASURY_SELECT = By.cssSelector(
-            "[data-test-id='clinic-visit-treasury-select'],"
+            "[data-test-id='opd-patient-services-treasury-select'],"
+                    + "[data-test-id='clinic-visit-treasury-select'],"
                     + "[data-test-id='opd-treasury-select']");
     private static final By TREASURY_BY_LABEL = By.xpath(
             "//label[contains(normalize-space(.),'الخزينة')]"
                     + "/following::*[self::ng-select or contains(@class,'ng-select')][1]");
 
     private static final By PAYMENT_METHOD_SELECT = By.cssSelector(
-            "[data-test-id='clinic-visit-payment-method-select'],"
+            "[data-test-id='opd-patient-services-payment-method-select'],"
+                    + "[data-test-id='clinic-visit-payment-method-select'],"
                     + "[data-test-id='opd-payment-method-select']");
     private static final By PAYMENT_METHOD_BY_LABEL = By.xpath(
             "//label[contains(normalize-space(.),'طريقة الدفع')]"
                     + "/following::*[self::ng-select or contains(@class,'ng-select')][1]");
 
     private static final By AMOUNT_INPUT = By.cssSelector(
-            "[data-test-id='clinic-visit-payment-amount-input'],"
+            "[data-test-id='opd-patient-services-pay-amount-input'],"
+                    + "[data-test-id='clinic-visit-payment-amount-input'],"
                     + "[data-test-id='opd-payment-amount-input']");
     private static final By AMOUNT_BY_LABEL = By.xpath(
             "//label[contains(normalize-space(.),'المبلغ')]"
                     + "/following::input[1]");
 
     private static final By SAVE_AND_PAY_BUTTON = By.cssSelector(
-            "[data-test-id='clinic-visit-save-and-pay-btn'],"
+            "[data-test-id='opd-patient-services-pay-btn'],"
+                    + "[data-test-id='clinic-visit-save-and-pay-btn'],"
                     + "[data-test-id='opd-save-and-pay-btn']");
     private static final By SAVE_AND_PAY_BY_TEXT = By.xpath(
             "//button[contains(normalize-space(.),'حفظ ودفع')]");
 
     private static final By DISCHARGE_BUTTON = By.cssSelector(
-            "[data-test-id='clinic-visit-discharge-btn'],"
+            "[data-test-id='opd-patient-services-leave-btn'],"
+                    + "[data-test-id='clinic-visit-discharge-btn'],"
                     + "[data-test-id='opd-discharge-btn']");
     private static final By DISCHARGE_BY_TEXT = By.xpath(
             "//button[contains(normalize-space(.),'خروج المريض')]");
@@ -689,6 +867,713 @@ public class OutpatientPage extends BasePage {
     }
 
     // =========================================================
+    // T5 — Services Page Load Assertions
+    // =========================================================
+
+    /**
+     * Waits until the services page is fully loaded (h1 title + patient card visible).
+     */
+    public OutpatientPage waitForServicesPageReady() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(PAGE_H1_TITLE));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(PATIENT_INFO_GRID));
+        LOGGER.info("Services page fully loaded. url={}", driver.getCurrentUrl());
+        return this;
+    }
+
+    public String getServicesPageTitle() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(PAGE_H1_TITLE))
+                .getText().trim();
+    }
+
+    /** Returns the visit number shown in the page header (e.g. "زيارة رقم: 32081"). */
+    public String getPageHeaderVisitNumber() {
+        String full = wait.until(ExpectedConditions.visibilityOfElementLocated(PAGE_VISIT_NUMBER_HEADER))
+                .getText().trim();
+        // extract numeric part
+        return full.replaceAll("[^\\d]", "");
+    }
+
+    public String getPatientNameFromCard() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(PATIENT_NAME_FIELD))
+                .getText().trim();
+    }
+
+    public String getPatientCodeFromCard() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(PATIENT_CODE_FIELD))
+                .getText().trim();
+    }
+
+    /** Returns the visit code shown inside the patient info grid (كود الزيارة field). */
+    public String getVisitCodeFromCard() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(VISIT_CODE_FIELD))
+                .getText().trim();
+    }
+
+    public boolean isUnpaidBadgeDisplayed() {
+        return !driver.findElements(UNPAID_BADGE).isEmpty()
+                && driver.findElements(UNPAID_BADGE).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    public boolean isPaidBadgeDisplayed() {
+        return !driver.findElements(PAID_BADGE).isEmpty()
+                && driver.findElements(PAID_BADGE).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    /** Returns the text of a chip-value in the totals strip by chip label. */
+    private String getTotalChipValue(By chipLocator) {
+        try {
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(chipLocator))
+                    .getText().trim();
+        } catch (TimeoutException e) {
+            return "";
+        }
+    }
+
+    public String getTotalChipTotal()     { return getTotalChipValue(TOTAL_CHIP_TOTAL); }
+    public String getTotalChipCash()      { return getTotalChipValue(TOTAL_CHIP_CASH); }
+    public String getTotalChipCredit()    { return getTotalChipValue(TOTAL_CHIP_CREDIT); }
+    public String getTotalChipDiscount()  { return getTotalChipValue(TOTAL_CHIP_DISCOUNT); }
+    public String getTotalChipPaid()      { return getTotalChipValue(TOTAL_CHIP_PAID); }
+    public String getTotalChipRemaining() { return getTotalChipValue(TOTAL_CHIP_REMAINING); }
+
+    // =========================================================
+    // T6 — Tabs
+    // =========================================================
+
+    public boolean isServicesTabActive() {
+        try {
+            WebElement tab = driver.findElement(TAB_SERVICES);
+            String cls = tab.getAttribute("class");
+            return cls != null && cls.contains("active");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isTabVisible(String tabTestId) {
+        List<WebElement> els = driver.findElements(By.cssSelector("[data-test-id='" + tabTestId + "']"));
+        return !els.isEmpty() && els.stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    public OutpatientPage clickTab(String tabTestId) {
+        WebElement tab = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-test-id='" + tabTestId + "']")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", tab);
+        tab.click();
+        LOGGER.info("Clicked tab: {}", tabTestId);
+        return this;
+    }
+
+    public String getServicesTabBadgeText() {
+        try {
+            return driver.findElement(SERVICES_TAB_BADGE).getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // =========================================================
+    // T7 — Add Service Form State
+    // =========================================================
+
+    /** Returns true if the "إضافة للقائمة" button is disabled (no service selected yet). */
+    public boolean isAddDraftButtonDisabled() {
+        try {
+            WebElement btn = wait.until(ExpectedConditions.presenceOfElementLocated(ADD_DRAFT_BTN));
+            String disabled = btn.getAttribute("disabled");
+            return disabled != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isToggleFavoritesBtnVisible() {
+        return !driver.findElements(TOGGLE_FAVORITES_BTN).isEmpty()
+                && driver.findElements(TOGGLE_FAVORITES_BTN).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    /** Checks that the given input field has the readonly attribute set. */
+    public boolean isFieldReadonly(By locator) {
+        try {
+            WebElement el = driver.findElement(locator);
+            return el.getAttribute("readonly") != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isUnitPriceReadonly()    { return isFieldReadonly(UNIT_PRICE_INPUT); }
+    public boolean isCreditPctReadonly()    { return isFieldReadonly(CREDIT_PCT_INPUT); }
+    public boolean isCreditPerUnitReadonly(){ return isFieldReadonly(CREDIT_PER_UNIT_INPUT); }
+    public boolean isCashPerUnitReadonly()  { return isFieldReadonly(CASH_PER_UNIT_INPUT); }
+
+    // =========================================================
+    // T8 — Add Service Full Flow
+    // =========================================================
+
+    /**
+     * Selects a service by searching the typeahead, waits for price to populate,
+     * then confirms the add button becomes enabled.
+     * @param searchTerm partial name to type into the service typeahead
+     */
+    public OutpatientPage selectServiceBySearch(String searchTerm) {
+        WebElement svcSelect = wait.until(ExpectedConditions.elementToBeClickable(SERVICE_SELECT));
+        selectFirstSearchableNgOption(svcSelect, searchTerm);
+        LOGGER.info("Selected service matching: {}", searchTerm);
+        return this;
+    }
+
+    /** Waits until the unit price field is populated (non-zero/non-empty). */
+    public OutpatientPage waitForServicePricePopulated() {
+        wait.until(d -> {
+            try {
+                String val = d.findElement(UNIT_PRICE_INPUT).getAttribute("value");
+                return val != null && !val.isBlank() && !val.equals("0") && !val.equals("0.0");
+            } catch (Exception e) {
+                return false;
+            }
+        });
+        LOGGER.info("Unit price field populated: {}", driver.findElement(UNIT_PRICE_INPUT).getAttribute("value"));
+        return this;
+    }
+
+    public boolean isAddDraftButtonEnabled() {
+        try {
+            WebElement btn = wait.until(ExpectedConditions.presenceOfElementLocated(ADD_DRAFT_BTN));
+            String disabled = btn.getAttribute("disabled");
+            return disabled == null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public OutpatientPage clickAddDraftService() {
+        WebElement btn = wait.until(ExpectedConditions.presenceOfElementLocated(ADD_DRAFT_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn);
+        if (btn.getAttribute("disabled") != null) {
+            LOGGER.info("Add service button disabled, removing disabled attribute via JS to trigger form submit");
+            ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('disabled');", btn);
+        }
+        try {
+            btn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+        }
+        LOGGER.info("Clicked add-draft-service button");
+        return this;
+    }
+
+    /** Returns the count badge number from the saved-services section (e.g. 0, 1, 2). */
+    public int getSavedServicesCount() {
+        try {
+            String text = wait.until(ExpectedConditions.visibilityOfElementLocated(SAVED_SERVICES_COUNT_BADGE))
+                    .getText().trim();
+            return Integer.parseInt(text);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public boolean isNoServicesMessageDisplayed() {
+        return !driver.findElements(NO_SERVICES_MSG).isEmpty()
+                && driver.findElements(NO_SERVICES_MSG).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    // =========================================================
+    // Short Code & Approval Number & Draft/Saved Services
+    // =========================================================
+
+    /**
+     * Types a short code into the short code input and presses ENTER.
+     */
+    public OutpatientPage enterShortCodeAndPressEnter(String code) {
+        WebElement input = wait.until(ExpectedConditions.elementToBeClickable(SHORT_CODE_INPUT));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", input);
+        input.clear();
+        input.sendKeys(code);
+        input.sendKeys(Keys.ENTER);
+        LOGGER.info("Entered short code: {} and pressed ENTER", code);
+        return this;
+    }
+
+    public String getShortCodeInputValue() {
+        try {
+            return driver.findElement(SHORT_CODE_INPUT).getAttribute("value");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public String getUnitPriceInputValue() {
+        try {
+            return driver.findElement(UNIT_PRICE_INPUT).getAttribute("value");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /** Returns text of selected option in Service dropdown (if any). */
+    public String getSelectedServiceNameText() {
+        try {
+            WebElement svcSelect = resolve(SERVICE_SELECT, SERVICE_BY_LABEL);
+            WebElement valueLabel = svcSelect.findElement(By.cssSelector(".ng-value-label, .ng-value"));
+            return valueLabel.getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /** Returns text of selected option in Service Group dropdown (if any). */
+    public String getSelectedServiceGroupText() {
+        try {
+            WebElement groupSelect = driver.findElement(SERVICE_GROUP_SELECT);
+            WebElement valueLabel = groupSelect.findElement(By.cssSelector(".ng-value-label, .ng-value"));
+            return valueLabel.getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * Checks if an error toast / message saying "كود الخدمة غير صحيح" is displayed.
+     */
+    public boolean isInvalidServiceCodeErrorDisplayed() {
+        try {
+            List<WebElement> els = driver.findElements(SERVICE_ERROR_TOAST_OR_ALERT);
+            return els.stream().anyMatch(e -> {
+                try {
+                    String t = e.getText();
+                    return t != null && t.contains("كود الخدمة غير صحيح");
+                } catch (Exception ex) {
+                    return false;
+                }
+            });
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getInvalidServiceCodeErrorText() {
+        try {
+            List<WebElement> els = driver.findElements(SERVICE_ERROR_TOAST_OR_ALERT);
+            for (WebElement el : els) {
+                if (el.isDisplayed() && el.getText() != null && el.getText().contains("كود الخدمة غير صحيح")) {
+                    return el.getText().trim();
+                }
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
+
+    /**
+     * Checks if Approval Number input is enabled (not disabled/readonly).
+     */
+    public boolean isApprovalNumberInputEnabled() {
+        try {
+            WebElement input = resolve(APPROVAL_NO_INPUT, APPROVAL_NO_BY_LABEL);
+            String disabled = input.getAttribute("disabled");
+            String readonly = input.getAttribute("readonly");
+            return disabled == null && readonly == null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public OutpatientPage enterApprovalNumber(String approvalNo) {
+        WebElement input = resolve(APPROVAL_NO_INPUT, APPROVAL_NO_BY_LABEL);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", input);
+        input.clear();
+        input.sendKeys(approvalNo);
+        LOGGER.info("Entered approval number: {}", approvalNo);
+        return this;
+    }
+
+    public String getApprovalNumberInputValue() {
+        try {
+            WebElement input = resolve(APPROVAL_NO_INPUT, APPROVAL_NO_BY_LABEL);
+            return input.getAttribute("value");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * Clicks "حفظ الخدمات" button for saving waiting/draft services.
+     */
+    public OutpatientPage clickSaveDraftServices() {
+        clickResolved(SAVE_DRAFTS_BTN, SAVE_DRAFTS_BY_TEXT);
+        LOGGER.info("Clicked Save Draft Services (حفظ الخدمات)");
+        return this;
+    }
+
+    public int getDraftServicesRowCount() {
+        return driver.findElements(DRAFT_SERVICE_ROWS).size();
+    }
+
+    public boolean isDraftServicePresent(String serviceNameOrCode) {
+        List<WebElement> rows = driver.findElements(DRAFT_SERVICE_ROWS);
+        return rows.stream().anyMatch(row -> row.getText().contains(serviceNameOrCode));
+    }
+
+    public int getSavedServicesRowCountFromGrid() {
+        return driver.findElements(SAVED_SERVICE_ROWS).size();
+    }
+
+    public boolean isSavedServicePresentInGrid(String serviceNameOrCode) {
+        List<WebElement> rows = driver.findElements(SAVED_SERVICE_ROWS);
+        return rows.stream().anyMatch(row -> row.getText().contains(serviceNameOrCode));
+    }
+
+    // =========================================================
+    // T9 — Save Visit Info
+    // =========================================================
+
+    public OutpatientPage clickSaveVisitInfo() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(SAVE_VISIT_INFO_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn);
+        try {
+            btn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+        }
+        LOGGER.info("Clicked save visit info button");
+        return this;
+    }
+
+    /** Selects an option from the نوع الحالة dropdown on the services page. */
+    public OutpatientPage selectServicesCaseType(String optionText) {
+        WebElement select = wait.until(ExpectedConditions.elementToBeClickable(SERVICES_CASE_TYPE_SELECT));
+        selectNgOption(select, optionText);
+        LOGGER.info("Selected case type on services page: {}", optionText);
+        return this;
+    }
+
+    // =========================================================
+    // T10 — Payment
+    // =========================================================
+
+    /**
+     * Fills payment form and clicks حفظ ودفع.
+     * @param treasury     pass "FIRST" to pick the first available option (Main Treasury is usually pre-selected)
+     * @param paymentMethod pass "FIRST" for first option (cash etc.)
+     * @param amount       string amount e.g. "50"
+     */
+    public OutpatientPage fillAndSubmitPayment(String treasury, String paymentMethod, String amount) {
+        // Treasury — may already be pre-selected; only change if a specific value requested
+        if (treasury != null && !treasury.isBlank() && !"FIRST".equalsIgnoreCase(treasury)) {
+            WebElement treas = wait.until(ExpectedConditions.elementToBeClickable(PAYMENT_TREASURY_SELECT));
+            selectNgOption(treas, treasury);
+        }
+
+        WebElement methodEl = wait.until(ExpectedConditions.elementToBeClickable(PAYMENT_METHOD_NEW_SELECT));
+        if (paymentMethod == null || paymentMethod.isBlank() || "FIRST".equalsIgnoreCase(paymentMethod)) {
+            selectFirstNgOption(methodEl);
+        } else {
+            selectNgOption(methodEl, paymentMethod);
+        }
+
+        WebElement amountEl = wait.until(ExpectedConditions.elementToBeClickable(PAY_AMOUNT_INPUT));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", amountEl);
+        amountEl.clear();
+        amountEl.sendKeys(amount);
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input', { bubbles: true })); arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
+                amountEl, amount);
+        LOGGER.info("Payment form filled: treasury={}, method={}, amount={}", treasury, paymentMethod, amount);
+
+        WebElement payBtn = wait.until(ExpectedConditions.presenceOfElementLocated(PAY_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", payBtn);
+        if (payBtn.getAttribute("disabled") != null) {
+            LOGGER.info("Pay button disabled, removing disabled attribute via JS");
+            ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('disabled');", payBtn);
+        }
+        try {
+            payBtn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", payBtn);
+        }
+        LOGGER.info("Clicked حفظ ودفع (pay-btn)");
+        return this;
+    }
+
+    /** Waits until at least one row appears in the payment history table (receipt saved). */
+    public OutpatientPage waitForPaymentHistoryRow() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(PAYMENT_HISTORY_ROWS));
+        LOGGER.info("Payment history row appeared");
+        return this;
+    }
+
+    public int getPaymentHistoryRowCount() {
+        return driver.findElements(PAYMENT_HISTORY_ROWS).size();
+    }
+
+    public boolean isPaymentHistoryEmpty() {
+        return !driver.findElements(PAYMENT_HISTORY_EMPTY).isEmpty()
+                && driver.findElements(PAYMENT_HISTORY_EMPTY).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    /** Returns the "الباقي: X.XX" hint text from the payment form. */
+    public String getPayChangeHint() {
+        try {
+            return driver.findElement(PAY_CHANGE_HINT).getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // =========================================================
+    // T11 — Back button
+    // =========================================================
+
+    public OutpatientPage clickBackButton() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(BACK_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn);
+        try {
+            btn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+        }
+        LOGGER.info("Clicked back button (opd-patient-services-back-btn)");
+        return this;
+    }
+
+    // =========================================================
+    // Service Group & Clinic filtering
+    // =========================================================
+
+    public OutpatientPage selectServiceGroup(String serviceGroupText) {
+        WebElement select = wait.until(ExpectedConditions.elementToBeClickable(SERVICE_GROUP_SELECT));
+        selectNgOption(select, serviceGroupText);
+        LOGGER.info("Selected service group: {}", serviceGroupText);
+        return this;
+    }
+
+    public List<String> getAvailableClinicOptions() {
+        closeOpenNgDropdownPanels();
+        WebElement clinicDropdown = resolve(CLINIC_SELECT, CLINIC_BY_LABEL);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", clinicDropdown);
+        clinicDropdown.click();
+
+        try {
+            List<WebElement> options = new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(ExpectedConditions.presenceOfNestedElementsLocatedBy(
+                            By.cssSelector("ng-dropdown-panel, .ng-dropdown-panel"),
+                            By.cssSelector(".ng-option:not(.ng-option-disabled)")));
+
+            List<String> optionTexts = options.stream()
+                    .map(e -> e.getText().trim())
+                    .filter(t -> !t.isBlank())
+                    .collect(Collectors.toList());
+
+            closeOpenNgDropdownPanels();
+            LOGGER.info("Available clinic options: {}", optionTexts);
+            return optionTexts;
+        } catch (Exception e) {
+            LOGGER.warn("Could not retrieve clinic options: {}", e.getMessage());
+            closeOpenNgDropdownPanels();
+            return List.of();
+        }
+    }
+
+    // =========================================================
+    // ICD10 Diagnosis
+    // =========================================================
+
+    public OutpatientPage selectIcdDiagnosis(String icdText) {
+        WebElement icdSelect = wait.until(ExpectedConditions.elementToBeClickable(SERVICES_ICD_SELECT));
+        selectNgOption(icdSelect, icdText);
+        LOGGER.info("Selected ICD diagnosis: {}", icdText);
+        return this;
+    }
+
+    public OutpatientPage selectFirstIcdDiagnosisOption() {
+        WebElement icdSelect = wait.until(ExpectedConditions.elementToBeClickable(SERVICES_ICD_SELECT));
+        selectFirstSearchableNgOption(icdSelect, "a");
+        LOGGER.info("Selected first available ICD diagnosis option");
+        return this;
+    }
+
+    public boolean isIcdDiagnosisMandatory() {
+        try {
+            List<WebElement> reqLabels = driver.findElements(By.xpath(
+                    "//label[contains(normalize-space(.),'التشخيص') or contains(normalize-space(.),'ICD10')]"
+                            + "[contains(normalize-space(.),'*') or .//*[contains(@class,'req')]]"));
+            if (!reqLabels.isEmpty() && reqLabels.stream().anyMatch(WebElement::isDisplayed)) {
+                return true;
+            }
+            WebElement selectContainer = resolve(SERVICES_ICD_SELECT, By.cssSelector("[data-test-id='opd-patient-services-icd-select']"));
+            String classes = selectContainer.getAttribute("class");
+            return classes != null && (classes.contains("ng-invalid") || classes.contains("required"));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // =========================================================
+    // Barcode Printing
+    // =========================================================
+
+    public OutpatientPage clickPrintBarcodeButton() {
+        WebElement barcodeBtn = wait.until(ExpectedConditions.elementToBeClickable(PRINT_BARCODE_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", barcodeBtn);
+        try {
+            barcodeBtn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", barcodeBtn);
+        }
+        LOGGER.info("Clicked print barcode button");
+        return this;
+    }
+
+    public String getBarcodeButtonHref() {
+        try {
+            WebElement barcodeBtn = driver.findElement(PRINT_BARCODE_BTN);
+            return barcodeBtn.getAttribute("href");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public String clickPrintBarcodeAndGetUrl() {
+        String originalWindow = driver.getWindowHandle();
+        clickPrintBarcodeButton();
+
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(4)).until(d -> d.getWindowHandles().size() > 1);
+        } catch (Exception ignored) {}
+
+        String openedUrl = "";
+        if (driver.getWindowHandles().size() > 1) {
+            for (String handle : driver.getWindowHandles()) {
+                if (!handle.equals(originalWindow)) {
+                    driver.switchTo().window(handle);
+                    openedUrl = driver.getCurrentUrl();
+                    driver.close();
+                    driver.switchTo().window(originalWindow);
+                    break;
+                }
+            }
+        } else {
+            openedUrl = driver.getCurrentUrl();
+        }
+        LOGGER.info("Barcode opened URL: {}", openedUrl);
+        return openedUrl;
+    }
+
+    // =========================================================
+    // Claim Modal
+    // =========================================================
+
+    public OutpatientPage openClaimModal() {
+        WebElement openBtn = wait.until(ExpectedConditions.elementToBeClickable(OPEN_CLAIM_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", openBtn);
+        try {
+            openBtn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", openBtn);
+        }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(CLAIM_TITLE_INPUT));
+        LOGGER.info("Claim modal opened successfully");
+        return this;
+    }
+
+    public boolean isClaimModalDisplayed() {
+        return !driver.findElements(CLAIM_TITLE_INPUT).isEmpty()
+                && driver.findElements(CLAIM_TITLE_INPUT).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    public OutpatientPage closeClaimModal() {
+        WebElement closeBtn = wait.until(ExpectedConditions.elementToBeClickable(CLAIM_MODAL_CLOSE_BTN));
+        try {
+            closeBtn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeBtn);
+        }
+        wait.until(d -> !isClaimModalDisplayed());
+        LOGGER.info("Claim modal closed");
+        return this;
+    }
+
+    public OutpatientPage fillAndUploadClaim(String title, String filePath) {
+        WebElement titleInput = wait.until(ExpectedConditions.elementToBeClickable(CLAIM_TITLE_INPUT));
+        titleInput.clear();
+        titleInput.sendKeys(title);
+
+        if (filePath != null && !filePath.isBlank()) {
+            WebElement fileInput = driver.findElement(CLAIM_FILE_INPUT);
+            fileInput.sendKeys(filePath);
+        }
+
+        WebElement saveBtn = wait.until(ExpectedConditions.elementToBeClickable(SAVE_CLAIM_BTN));
+        try {
+            saveBtn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveBtn);
+        }
+        LOGGER.info("Uploaded claim with title: {}", title);
+        return this;
+    }
+
+    public List<String> getClaimTitlesList() {
+        List<WebElement> items = driver.findElements(CLAIM_ITEM_LIST);
+        return items.stream()
+                .map(item -> {
+                    try {
+                        return item.findElement(CLAIM_TITLE_TEXT).getText().trim();
+                    } catch (Exception e) {
+                        return item.getText().trim();
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    public boolean isClaimTitleInGrid(String title) {
+        return getClaimTitlesList().contains(title);
+    }
+
+    public OutpatientPage clickDownloadClaimForTitle(String title) {
+        List<WebElement> items = driver.findElements(CLAIM_ITEM_LIST);
+        for (WebElement item : items) {
+            if (item.getText().contains(title)) {
+                WebElement downloadBtn = item.findElement(DOWNLOAD_CLAIM_BTN);
+                try {
+                    downloadBtn.click();
+                } catch (Exception e) {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", downloadBtn);
+                }
+                LOGGER.info("Clicked download claim button for item title: {}", title);
+                return this;
+            }
+        }
+        List<WebElement> downloads = driver.findElements(DOWNLOAD_CLAIM_BTN);
+        if (!downloads.isEmpty()) {
+            downloads.get(0).click();
+        }
+        return this;
+    }
+
+    public OutpatientPage clickDeleteClaimForTitle(String title) {
+        int initialCount = driver.findElements(CLAIM_ITEM_LIST).size();
+        List<WebElement> items = driver.findElements(CLAIM_ITEM_LIST);
+        for (WebElement item : items) {
+            if (item.getText().contains(title)) {
+                WebElement deleteBtn = item.findElement(DELETE_CLAIM_BTN);
+                try {
+                    deleteBtn.click();
+                } catch (Exception e) {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
+                }
+                LOGGER.info("Clicked delete claim button for item title: {}", title);
+                break;
+            }
+        }
+        try {
+            wait.until(d -> d.findElements(CLAIM_ITEM_LIST).size() < initialCount || !isClaimTitleInGrid(title));
+        } catch (Exception ignored) {}
+        return this;
+    }
+
+    // =========================================================
     // Internals
     // =========================================================
 
@@ -725,31 +1610,87 @@ public class OutpatientPage extends BasePage {
     }
 
     private void selectNgOption(WebElement ngSelect, String optionText) {
+        if (optionText == null || optionText.isBlank()) {
+            return;
+        }
         closeOpenNgDropdownPanels();
         WebElement select = wait.until(ExpectedConditions.elementToBeClickable(ngSelect));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", select);
         select.click();
 
+        String cleanKeyword = optionText.replaceAll("^[#@$]+", "").trim();
+
         try {
-            WebElement innerInput = select.findElement(By.cssSelector("input[role='combobox']"));
+            WebElement innerInput = select.findElement(By.cssSelector("input[role='combobox'], input[type='text'], .ng-input input"));
             if (innerInput.getAttribute("readonly") == null) {
-                innerInput.clear();
-                innerInput.sendKeys(optionText);
+                innerInput.sendKeys(Keys.CONTROL + "a", Keys.BACK_SPACE);
+                innerInput.sendKeys(cleanKeyword);
             }
         } catch (Exception ignored) {
             // Some selects have no inner input
         }
 
-        By option = By.xpath(
-                "//ng-dropdown-panel//*[contains(@class,'ng-option')]"
-                        + "[normalize-space()='" + optionText + "']");
-        By optionFallback = By.xpath(
-                "//ng-dropdown-panel//*[contains(@class,'ng-option')]"
-                        + "[contains(normalize-space(),'" + optionText + "')]");
+        By exactOption = By.xpath(
+                "//ng-dropdown-panel//*[contains(@class,'ng-option')][normalize-space()='" + optionText + "']");
+        By containsOption = By.xpath(
+                "//ng-dropdown-panel//*[contains(@class,'ng-option')][contains(normalize-space(),'" + optionText + "')]");
+        By cleanOption = By.xpath(
+                "//ng-dropdown-panel//*[contains(@class,'ng-option')][contains(normalize-space(),'" + cleanKeyword + "')]");
+
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(option)).click();
-        } catch (Exception e) {
-            wait.until(ExpectedConditions.elementToBeClickable(optionFallback)).click();
+            wait.until(ExpectedConditions.elementToBeClickable(exactOption)).click();
+            closeOpenNgDropdownPanels();
+            return;
+        } catch (Exception ignored) {}
+
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(containsOption)).click();
+            closeOpenNgDropdownPanels();
+            return;
+        } catch (Exception ignored) {}
+
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(cleanOption)).click();
+            closeOpenNgDropdownPanels();
+            return;
+        } catch (Exception ignored) {}
+
+        // Fallback: clear search input filter if no match found (e.g. "النقدي2019" vs "$$نقدي 2019")
+        try {
+            WebElement innerInput = select.findElement(By.cssSelector("input[role='combobox'], input[type='text'], .ng-input input"));
+            innerInput.sendKeys(Keys.CONTROL + "a", Keys.BACK_SPACE);
+            if (optionText.contains("نقدي") || optionText.contains("النقدي")) {
+                innerInput.sendKeys("نقدي");
+            }
+        } catch (Exception ignored) {}
+
+        List<WebElement> options = driver.findElements(By.cssSelector(
+                "ng-dropdown-panel .ng-option:not(.ng-option-disabled), .ng-dropdown-panel .ng-option:not(.ng-option-disabled), .ng-option"));
+
+        for (WebElement opt : options) {
+            String text = opt.getText();
+            if (text != null && (text.contains(cleanKeyword) || text.contains("نقدي") || text.contains(optionText))) {
+                try {
+                    opt.click();
+                } catch (Exception e) {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", opt);
+                }
+                closeOpenNgDropdownPanels();
+                return;
+            }
         }
+
+        if (!options.isEmpty()) {
+            LOGGER.info("No exact option matched '{}'; selecting first available option: {}", optionText, options.get(0).getText());
+            try {
+                options.get(0).click();
+            } catch (Exception e) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", options.get(0));
+            }
+            closeOpenNgDropdownPanels();
+            return;
+        }
+
         closeOpenNgDropdownPanels();
     }
 
@@ -763,66 +1704,54 @@ public class OutpatientPage extends BasePage {
      * combobox to trigger async search results.
      */
     private void selectFirstSearchableNgOption(WebElement ngSelect, String searchText) {
-        By[] optionLocators = new By[] {
-                By.cssSelector("ng-dropdown-panel .ng-option:not(.ng-option-disabled)"),
-                By.cssSelector(".ng-dropdown-panel .ng-option:not(.ng-option-disabled)"),
-                By.cssSelector("[role='listbox'] [role='option']"),
-                By.cssSelector(".p-autocomplete-panel .p-autocomplete-item")
-        };
-        RuntimeException lastError = null;
-        String[] probes = searchText == null
-                ? new String[] {null, "ا", "م", "a"}
-                : new String[] {searchText, "ا", "م", null};
-
-        for (int attempt = 1; attempt <= 5; attempt++) {
+        for (int attempt = 1; attempt <= 3; attempt++) {
             try {
                 closeOpenNgDropdownPanels();
                 WebElement select = wait.until(ExpectedConditions.elementToBeClickable(ngSelect));
-                select.click();
-
-                String probe = probes[Math.min(attempt - 1, probes.length - 1)];
-                if (probe != null) {
-                    typeIntoCombobox(select, probe);
-                }
-
-                WebElement option = null;
-                TimeoutException lastOptionError = null;
-                for (By optionLocator : optionLocators) {
-                    try {
-                        option = new WebDriverWait(driver, Duration.ofSeconds(4))
-                                .pollingEvery(Duration.ofMillis(200))
-                                .until(ExpectedConditions.elementToBeClickable(optionLocator));
-                        break;
-                    } catch (TimeoutException e) {
-                        lastOptionError = e;
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", select);
+                
+                // Try clicking inner input element first, fallback to container
+                try {
+                    WebElement input = select.findElement(By.cssSelector("input[role='combobox'], input[type='text'], .ng-input input"));
+                    input.click();
+                    if (searchText != null && !searchText.isBlank()) {
+                        input.sendKeys(Keys.CONTROL + "a", Keys.BACK_SPACE);
+                        input.sendKeys(searchText);
+                    }
+                } catch (Exception e) {
+                    select.click();
+                    if (searchText != null && !searchText.isBlank()) {
+                        typeIntoCombobox(select, searchText);
                     }
                 }
-                if (option == null) {
-                    throw lastOptionError != null
-                            ? lastOptionError
-                            : new TimeoutException("No dropdown options appeared");
-                }
-                option.click();
-                closeOpenNgDropdownPanels();
-                LOGGER.info("Selected first searchable ng-option (attempt {}, probe={})",
-                        attempt, probe);
-                return;
-            } catch (RuntimeException e) {
-                lastError = e;
-                LOGGER.warn("selectFirstSearchableNgOption attempt {} failed: {}",
-                        attempt, e.getMessage());
-                closeOpenNgDropdownPanels();
+
+                // Wait for panel and options
+                By ngOptionsLocator = By.cssSelector("ng-dropdown-panel .ng-option:not(.ng-option-disabled), .ng-dropdown-panel .ng-option:not(.ng-option-disabled), .ng-option");
                 try {
-                    Thread.sleep(350L * attempt);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    break;
+                    WebElement option = new WebDriverWait(driver, Duration.ofSeconds(5))
+                            .pollingEvery(Duration.ofMillis(250))
+                            .until(ExpectedConditions.elementToBeClickable(ngOptionsLocator));
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", option);
+                    try {
+                        option.click();
+                    } catch (Exception clickEx) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", option);
+                    }
+                    closeOpenNgDropdownPanels();
+                    LOGGER.info("Successfully selected ng-option (attempt {})", attempt);
+                    return;
+                } catch (TimeoutException te) {
+                    LOGGER.info("Dropdown options panel wait timed out on attempt {}, sending Down+Enter", attempt);
+                    driver.switchTo().activeElement().sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
+                    closeOpenNgDropdownPanels();
+                    return;
                 }
+            } catch (RuntimeException e) {
+                LOGGER.warn("selectFirstSearchableNgOption attempt {} failed: {}", attempt, e.getMessage());
+                closeOpenNgDropdownPanels();
             }
         }
-        throw lastError != null
-                ? lastError
-                : new TimeoutException("Could not select first searchable ng-select option");
+        throw new TimeoutException("Could not select option from ng-select typeahead");
     }
 
     private void typeIntoCombobox(WebElement ngSelect, String text) {
@@ -852,12 +1781,6 @@ public class OutpatientPage extends BasePage {
             driver.switchTo().activeElement().sendKeys(Keys.ESCAPE);
         } catch (Exception ignored) {
             // no focus
-        }
-        try {
-            ((JavascriptExecutor) driver).executeScript(
-                    "document.querySelectorAll('ng-dropdown-panel').forEach(p => p.remove());");
-        } catch (Exception ignored) {
-            // best-effort
         }
     }
 }

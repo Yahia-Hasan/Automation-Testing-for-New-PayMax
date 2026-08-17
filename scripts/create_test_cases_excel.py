@@ -401,6 +401,28 @@ CASES = [
         "verifyIncompatibleVisitSwitchShowsError",
     ),
     (
+        "TC-ADM-033",
+        "Refresh on selected patient (/reception/patient/{code}) redirects to /reception",
+        "عمل Refresh وصفحة مريض مختار (/reception/patient/{code}) يرجع إلى /reception",
+        "Open/save a patient so URL is /reception/patient/{code}, refresh the browser, and assert the URL becomes exact /reception (not the patient detail URL).",
+        "فتح/حفظ مريض بحيث يكون الرابط /reception/patient/{code}، عمل Refresh، والتحقق أن الرابط يصبح /reception بالظبط (مش صفحة تفاصيل المريض).",
+        "Positive",
+        "High",
+        "Automated",
+        "refreshOnPatientProfileRedirectsToReception",
+    ),
+    (
+        "TC-ADM-034",
+        "New (جديد) on selected patient navigates to exact /reception",
+        "زرار جديد على مريض مختار يوجّه إلى /reception",
+        "With a selected patient URL /reception/patient/{code}, click جديد and assert navigation to exact /reception.",
+        "مع مريض مختار على /reception/patient/{code}، الضغط على جديد والتحقق من الانتقال إلى /reception بالظبط.",
+        "Positive",
+        "High",
+        "Automated",
+        "newButtonOnPatientProfileNavigatesToReception",
+    ),
+    (
         "TC-OPD-001",
         "Draft OPD visit: fill نوع الحالة + الشركة الفرعية, save → /services",
         "مسودة زيارة خارجية: ملء نوع الحالة والشركة الفرعية ثم الحفظ → /services",
@@ -444,6 +466,182 @@ CASES = [
         "Planned",
         "addServiceAndVerifyTotalUpdates",
     ),
+    (
+        "TC-ADM-035",
+        "Reservation Agenda modal opens with current dates (from/to)",
+        "نافذة أجندة الحجوزات تفتح بالتاريخ الحالي (من/إلى)",
+        "Open Reservation Agenda modal and verify default dates (from/to) are set to today's date.",
+        "فتح نافذة أجندة الحجوزات والتحقق من ضبط تاريخ البداية والنهاية افتراضيًا على تاريخ اليوم.",
+        "Positive",
+        "High",
+        "Automated",
+        "verifyReservationAgendaModalOpensWithCurrentDates",
+    ),
+    (
+        "TC-ADM-036",
+        "Reservation Agenda search by specific date returns matching results",
+        "البحث في أجندة الحجوزات بتاريخ محدد يظهر النتيجة المطابقة",
+        "Search reservations for specific date 2026-08-08 and verify exact row count in the grid.",
+        "البحث في أجندة الحجوزات بتاريخ محدد (2026-08-08) والتحقق من ظهور العدد المطابق في الجدول.",
+        "Positive",
+        "High",
+        "Automated",
+        "verifyReservationSearchBySpecificDate",
+    ),
+    (
+        "TC-OPD-005",
+        "Services page header title and summary chips verification",
+        "التحقق من عنوان الهيدر ومؤشرات ملخص صفحة الخدمات",
+        "Verify patient name title and summary chips (total, paid, insurance %, remaining, services count) on services page.",
+        "التحقق من اسم المريض في العنوان ومؤشرات الملخص (الإجمالي، المدفوع، التأمين، المتبقي، عدد الخدمات) في صفحة الخدمات.",
+        "Positive",
+        "High",
+        "Automated",
+        "verifyServicesPageHeaderAndSummaryChips",
+    ),
+    (
+        "TC-OPD-006",
+        "Services tabs active state and badge counts",
+        "تبويبات صفحة الخدمات والشارات الرقمية",
+        "Verify الخدمات tab is active by default and badge shows initial count (0) on fresh visit.",
+        "التحقق أن تبويب الخدمات نشط افتراضيًا والشارة تظهر العدد الأولي (0) عند فتح زيارة جديدة.",
+        "Positive",
+        "Medium",
+        "Automated",
+        "verifyServicesTabsAndBadges",
+    ),
+    (
+        "TC-OPD-007",
+        "Add service form initial state and price field restrictions",
+        "الحالة الأولية لنموذج إضافة خدمة وقيود أسعار الخدمات",
+        "Verify إضافة للقائمة button disabled, prices read-only, favorites button visible, and empty message shown.",
+        "التحقق من تعطيل زرار إضافة للقائمة، وأن أسعار الخدمة للقراءة فقط، وزرار المفضلة ظاهر ورسالة لا توجد خدمات تظهر.",
+        "Positive",
+        "Medium",
+        "Automated",
+        "addServiceFormInitialState",
+    ),
+    (
+        "TC-OPD-008",
+        "Add service to visit and save visit info",
+        "إضافة خدمة للزيارة وحفظ بيانات الزيارة",
+        "Select service/doctor/clinic, click add to list, save visit info, and verify successful save.",
+        "اختيار الخدمة والطبيب والعيادة، الضغط على إضافة للقائمة، حفظ بيانات الزيارة والتحقق من الحفظ بنجاح.",
+        "Positive",
+        "High",
+        "Automated",
+        "addServiceUpdatesListAndTotal",
+    ),
+    (
+        "TC-OPD-009",
+        "Save visit info button shows success toast notification",
+        "الضغط على حفظ بيانات الزيارة يظهر توست النجاح",
+        "Click حفظ (save visit info) button and verify success toast notification appears.",
+        "الضغط على زرار حفظ بيانات الزيارة والتحقق من ظهور رسالة النجاح (Toast).",
+        "Positive",
+        "High",
+        "Automated",
+        "saveVisitInfoShowsSuccessToast",
+    ),
+    (
+        "TC-OPD-010",
+        "OPD visit payment flow generates receipt and updates history table",
+        "سداد خدمات الزيارة الخارجية ينشئ إيصالاً ويحدّث جدول الإيصالات",
+        "Submit payment for visit services and verify a new receipt row appears in the payment history table.",
+        "تنفيذ سداد خدمات الزيارة والتحقق من إضافة صف إيصال جديد في جدول سجل الإيصالات.",
+        "Positive",
+        "High",
+        "Automated",
+        "paymentCreatesReceiptAndUpdatesPaidChip",
+    ),
+    (
+        "TC-OPD-011",
+        "Services page back button navigates to previous page",
+        "زرار العودة بصفحة الخدمات يرجع للصفحة السابقة",
+        "Click opd-patient-services-back-btn button and verify navigation away from services page.",
+        "الضغط على زرار العودة (رجوع) في صفحة الخدمات والتحقق من مغادرة الصفحة بنجاح.",
+        "Positive",
+        "Medium",
+        "Automated",
+        "backButtonNavigatesFromServicesPage",
+    ),
+    (
+        "TC-OPD-012",
+        "Service group filter limits available clinics",
+        "فلترة مجموعة الخدمات تحدد العيادات المتاحة",
+        "Select service group الرمد والليزك in opd-patient-services-service-group-select and verify clinic dropdown displays only عيادة 8.",
+        "اختيار مجموعة الخدمات الرمد والليزك والتحقق أن قائمة العيادات المتاحة تحتوي فقط على عيادة 8.",
+        "Positive",
+        "High",
+        "Automated",
+        "serviceGroupFilterLimitsClinicOptions",
+    ),
+    (
+        "TC-OPD-013",
+        "ICD10 Diagnosis mandatory validation by entity (optional for النقدي2019, mandatory for اليكو)",
+        "التحقق من إلزامية تشخيص ICD10 حسب الجهة (اختياري للنقدي2019 وإجباري لاليكو)",
+        "Verify OPD visit with entity النقدي2019 saves without ICD10 diagnosis, while entity اليكو blocks save until ICD10 diagnosis is selected.",
+        "التحقق أن الزيارة مع جهة النقدي2019 تحفظ بدون تشخيص ICD10، بينما تمنع جهة اليكو الحفظ إلا بعد اختيار تشخيص ICD10.",
+        "Positive",
+        "High",
+        "Automated",
+        "icdDiagnosisMandatoryValidationByEntity",
+    ),
+    (
+        "TC-OPD-014",
+        "Print barcode button opens correct barcode URL",
+        "زرار طباعة الباركود يفتح الرابط الصحيح للباركود",
+        "Click opd-patient-services-print-barcode-btn button and verify opened URL matches /clinic/visits/{visitCode}/barcode-print.",
+        "الضغط على زرار طباعة الباركود والتحقق أن الرابط المفتوح يطابق /clinic/visits/{كود الزيارة}/barcode-print.",
+        "Positive",
+        "Medium",
+        "Automated",
+        "printBarcodeButtonOpensCorrectUrl",
+    ),
+    (
+        "TC-OPD-015",
+        "Claim form modal CRUD operations (add, download, delete claim file)",
+        "عمليات نموذج المطالبة (إضافة، تحميل، حذف ملف المطالبة)",
+        "Open claim modal via opd-patient-services-open-claim-btn, upload claim title and file, verify in grid, test download and delete buttons.",
+        "فتح بوب أب المطالبة، رفع عنوان وملف المطالبة، التأكد من التواجد في الجدول، وتجربة أزرار التحميل والحذف.",
+        "Positive",
+        "Medium",
+        "Automated",
+        "claimModalAddDownloadAndDeleteOperations",
+    ),
+    (
+        "TC-OPD-016",
+        "Service short code lookup (valid code 4444 populates data, invalid code 91238128 triggers error message)",
+        "التحقق من الكود المختصر للخدمة (الكود الصحيح 4444 يجيب البيانات، والكود الخاطئ 91238128 يظهر خطأ)",
+        "Type short code 4444 + ENTER to verify service and price auto-populate. Type invalid code 91238128 + ENTER to verify error message كود الخدمة غير صحيح.",
+        "إدخال الكود المختصر 4444 والضغط على ENTER والتحقق من تعبئة الخدمة والسعر تلقائيًا. إدخال الكود الخاطئ 91238128 والضغط على ENTER والتحقق من ظهور رسالة الخطأ كود الخدمة غير صحيح.",
+        "Positive",
+        "High",
+        "Automated",
+        "serviceShortCodeValidAndInvalidVerification",
+    ),
+    (
+        "TC-OPD-017",
+        "Approval number field state toggle (closed by default, enabled for service 444)",
+        "حالة حقل رقم الموافقة (معطل افتراضيًا ويفتح للخدمة 444 التي تطلب موافقة)",
+        "Verify approval number field is closed/disabled by default, and becomes enabled/open when service 444 is selected.",
+        "التحقق أن حقل رقم الموافقة معطل/مغلق افتراضيًا للخدمات العادية، ويفتح للإدخال عند اختيار الخدمة 444.",
+        "Positive",
+        "High",
+        "Automated",
+        "approvalNumberFieldToggleVerification",
+    ),
+    (
+        "TC-OPD-018",
+        "Complete outpatient service draft and save cycle (group -> service 444 -> doctor -> clinic -> approval no -> draft list -> saved grid)",
+        "السايكل الكاملة للخدمات الخارجية (مجموعة الخدمات -> الخدمة 444 -> الطبيب -> العيادة -> رقم الموافقة -> قائمة الانتظار -> الحفظ في الجريد)",
+        "Execute full OPD service cycle: select service group, service 444, doctor, clinic, approval number 324, click add to list (Draft), then click save drafts and verify transfer to saved services grid.",
+        "تنفيذ سايكل إضافة الخدمة بالكامل: اختيار مجموعة الخدمات والخدمة 444 والطبيب والعيادة ورقم الموافقة 324 والضغط على إضافة للقائمة لتنزل في خدمات في الانتظار ثم حفظ الخدمات والتحقق من انتقالها لجدول الخدمات المحفوظة.",
+        "Positive",
+        "High",
+        "Automated",
+        "completeServicesDraftAndSaveCycle",
+    ),
 ]
 
 # Suite override (default = PatientAdmissionTests)
@@ -457,6 +655,20 @@ SUITE_BY_ID = {
     "TC-OPD-002": SUITE_OPD,
     "TC-OPD-003": SUITE_OPD,
     "TC-OPD-004": SUITE_OPD,
+    "TC-OPD-005": SUITE_OPD,
+    "TC-OPD-006": SUITE_OPD,
+    "TC-OPD-007": SUITE_OPD,
+    "TC-OPD-008": SUITE_OPD,
+    "TC-OPD-009": SUITE_OPD,
+    "TC-OPD-010": SUITE_OPD,
+    "TC-OPD-011": SUITE_OPD,
+    "TC-OPD-012": SUITE_OPD,
+    "TC-OPD-013": SUITE_OPD,
+    "TC-OPD-014": SUITE_OPD,
+    "TC-OPD-015": SUITE_OPD,
+    "TC-OPD-016": SUITE_OPD,
+    "TC-OPD-017": SUITE_OPD,
+    "TC-OPD-018": SUITE_OPD,
 }
 
 MODULE_BY_ID = {
@@ -464,6 +676,20 @@ MODULE_BY_ID = {
     "TC-OPD-002": (MODULE_OPD_EN, MODULE_OPD_AR),
     "TC-OPD-003": (MODULE_OPD_EN, MODULE_OPD_AR),
     "TC-OPD-004": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-005": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-006": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-007": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-008": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-009": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-010": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-011": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-012": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-013": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-014": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-015": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-016": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-017": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-OPD-018": (MODULE_OPD_EN, MODULE_OPD_AR),
 }
 
 DATE_BY_ID = {
@@ -478,10 +704,28 @@ DATE_BY_ID = {
     "TC-ADM-030": "2026-07-28",
     "TC-ADM-031": "2026-07-28",
     "TC-ADM-032": "2026-07-28",
-    "TC-OPD-001": TODAY,
-    "TC-OPD-002": TODAY,
-    "TC-OPD-003": TODAY,
-    "TC-OPD-004": TODAY,
+    "TC-ADM-033": "2026-08-08",
+    "TC-ADM-034": "2026-08-08",
+    "TC-ADM-035": "2026-08-10",
+    "TC-ADM-036": "2026-08-10",
+    "TC-OPD-001": "2026-08-07",
+    "TC-OPD-002": "2026-08-07",
+    "TC-OPD-003": "2026-08-07",
+    "TC-OPD-004": "2026-08-07",
+    "TC-OPD-005": "2026-08-10",
+    "TC-OPD-006": "2026-08-10",
+    "TC-OPD-007": "2026-08-10",
+    "TC-OPD-008": "2026-08-10",
+    "TC-OPD-009": "2026-08-10",
+    "TC-OPD-010": "2026-08-10",
+    "TC-OPD-011": "2026-08-10",
+    "TC-OPD-012": "2026-08-16",
+    "TC-OPD-013": "2026-08-16",
+    "TC-OPD-014": "2026-08-16",
+    "TC-OPD-015": "2026-08-16",
+    "TC-OPD-016": "2026-08-16",
+    "TC-OPD-017": "2026-08-16",
+    "TC-OPD-018": "2026-08-16",
 }
 
 # Notes stamped on rows added in later batches
@@ -497,10 +741,28 @@ NOTES_BY_ID = {
     "TC-ADM-030": "Added 2026-07-28 — Under-dev action buttons",
     "TC-ADM-031": "Added 2026-07-28 — External visit family (same visit code)",
     "TC-ADM-032": "Added 2026-07-28 — Incompatible visit ERROR",
+    "TC-ADM-033": "Added 2026-08-08 — Refresh patient profile → /reception",
+    "TC-ADM-034": "Added 2026-08-08 — جديد on patient profile → /reception",
+    "TC-ADM-035": "Added 2026-08-10 — Reservation Agenda modal current dates",
+    "TC-ADM-036": "Added 2026-08-10 — Reservation Agenda search by specific date",
     "TC-OPD-001": "Added 2026-08-07 — OPD draft → services",
     "TC-OPD-002": "Added 2026-08-07 — Continue same visit (patient-data-continue-same-visit-btn)",
     "TC-OPD-003": "Added 2026-08-07 — Close unpaid visit blocked (Swal confirm + تنبيه)",
     "TC-OPD-004": "Added 2026-08-07 — Deferred (enabled=false) until clarified",
+    "TC-OPD-005": "Added 2026-08-10 — OPD services page header & summary chips",
+    "TC-OPD-006": "Added 2026-08-10 — OPD services page tabs & badge counts",
+    "TC-OPD-007": "Added 2026-08-10 — Add service form initial state & price field restrictions",
+    "TC-OPD-008": "Added 2026-08-10 — Add service full flow & save visit info",
+    "TC-OPD-009": "Added 2026-08-10 — Save visit info button success toast",
+    "TC-OPD-010": "Added 2026-08-10 — OPD payment flow & receipt history table",
+    "TC-OPD-011": "Added 2026-08-10 — OPD services page back button navigation",
+    "TC-OPD-012": "Added 2026-08-16 — Service group clinic filter",
+    "TC-OPD-013": "Added 2026-08-16 — ICD10 mandatory check by entity",
+    "TC-OPD-014": "Added 2026-08-16 — Print barcode button URL",
+    "TC-OPD-015": "Added 2026-08-16 — Claim modal operations",
+    "TC-OPD-016": "Added 2026-08-16 — Short code lookup (valid 4444 & invalid 91238128 error)",
+    "TC-OPD-017": "Added 2026-08-16 — Approval number field state toggle (service 444)",
+    "TC-OPD-018": "Added 2026-08-16 — Complete OPD service draft & save cycle",
 }
 
 
@@ -582,12 +844,27 @@ def main():
     ws2["A46"] = "TC-OPD-002 → Continue same visit (patient-data-continue-same-visit-btn)"
     ws2["A47"] = "TC-OPD-003 → Close unpaid visit blocked (confirm نعم → تنبيه لم تُدفع بعد)"
     ws2["A48"] = "TC-OPD-004 → Add service & total (Planned / enabled=false)"
-    ws2["A50"] = "Seed patients (manual setup):"
+    ws2["A50"] = "Added on 2026-08-08 / اللي اتضاف يوم 08-08 (Reception URL reset)"
     ws2["A50"].font = Font(bold=True, size=12)
-    ws2["A51"] = "OPD active 30499 | Unpaid OPD 30552 | Inpatient 30496 | Emergency 30495 | Rays 30485 | Lab 30456"
-    ws2["A53"] = "Suggested ID prefixes:"
-    ws2["A53"].font = Font(bold=True, size=12)
-    ws2["A54"] = "ADM = Patient Admission | OPD = Outpatient | BILL = Billing | LAB = Lab | PHARM = Pharmacy | AUTH = Login/Auth"
+    ws2["A51"] = "TC-ADM-033 → Refresh on /reception/patient/{code} redirects to /reception"
+    ws2["A52"] = "TC-ADM-034 → جديد on selected patient navigates to /reception"
+    ws2["A54"] = "Added on 2026-08-10 / اللي اتضاف يوم 10-08 (Reservation Agenda & OPD Services/Payments)"
+    ws2["A54"].font = Font(bold=True, size=12)
+    ws2["A55"] = "TC-ADM-035 → Reservation Agenda modal opens with current dates (from/to = today)"
+    ws2["A56"] = "TC-ADM-036 → Reservation Agenda search by specific date (2026-08-08) returns matching results"
+    ws2["A57"] = "TC-OPD-005 → OPD services page header title and summary chips (total, paid, insurance %, remaining, services count)"
+    ws2["A58"] = "TC-OPD-006 → OPD services page tabs active state & badge counts"
+    ws2["A59"] = "TC-OPD-007 → Add service form initial state & price field restrictions (readonly)"
+    ws2["A60"] = "TC-OPD-008 → Add service to visit & save visit info"
+    ws2["A61"] = "TC-OPD-009 → Save visit info button success toast notification"
+    ws2["A62"] = "TC-OPD-010 → OPD visit payment flow (receipt created & added to history table)"
+    ws2["A63"] = "TC-OPD-011 → Services page back button navigation"
+    ws2["A65"] = "Seed patients (manual setup):"
+    ws2["A65"].font = Font(bold=True, size=12)
+    ws2["A66"] = "OPD active 30499 | Unpaid OPD 30552 | Inpatient 30496 | Emergency 30495 | Rays 30485 | Lab 30456"
+    ws2["A68"] = "Suggested ID prefixes:"
+    ws2["A68"].font = Font(bold=True, size=12)
+    ws2["A69"] = "ADM = Patient Admission | OPD = Outpatient | BILL = Billing | LAB = Lab | PHARM = Pharmacy | AUTH = Login/Auth"
     ws2.column_dimensions["A"].width = 110
 
     # ---- Test Cases sheet ----
@@ -698,8 +975,11 @@ def main():
     for col, width in zip("ABCDEF", [36, 32, 12, 12, 12, 12]):
         ws3.column_dimensions[col].width = width
 
+    out_dated = r"d:\Ma3n\Automation Test For new Paymax\Paymax_Test_Cases 10-8-2026.xlsx"
     wb.save(OUT)
+    wb.save(out_dated)
     print(f"Saved: {OUT}")
+    print(f"Saved: {out_dated}")
     print(f"Total cases: {len(CASES)}")
 
 

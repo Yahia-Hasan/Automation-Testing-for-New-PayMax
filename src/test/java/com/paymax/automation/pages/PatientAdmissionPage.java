@@ -54,6 +54,25 @@ public class PatientAdmissionPage extends BasePage {
     private static final By UNKNOWN_PATIENT_SAVE_BUTTON =
             By.cssSelector("[data-test-id='patient-data-save-unknown-btn']");
 
+    // ---------- Reservation Agenda Modal ----------
+    private static final By RESERVATION_AGENDA_BTN =
+            By.cssSelector("[data-test-id='patient-data-reservation-agenda-btn']");
+    private static final By RESERVATION_MODAL_BACKDROP =
+            By.cssSelector("[data-test-id='patient-data-reservation-modal-backdrop']");
+    private static final By RESERVATION_MODAL =
+            By.cssSelector("[data-test-id='patient-data-reservation-modal']");
+    private static final By RESERVATION_CLOSE_BTN =
+            By.cssSelector("[data-test-id='patient-data-reservation-modal-close-btn']");
+    private static final By RESERVATION_FROM_DATE_INPUT =
+            By.cssSelector("[data-test-id='patient-data-reservation-modal'] .reservation-filters div.fg:nth-child(1) input[type='date']");
+    private static final By RESERVATION_TO_DATE_INPUT =
+            By.cssSelector("[data-test-id='patient-data-reservation-modal'] .reservation-filters div.fg:nth-child(2) input[type='date']");
+    private static final By RESERVATION_SHOW_BTN =
+            By.cssSelector("[data-test-id='patient-data-reservation-show-btn']");
+    private static final By RESERVATION_TABLE_ROWS =
+            By.cssSelector("[data-test-id='patient-data-reservation-modal'] table.tbl tbody tr");
+
+
     // ---------- Search ----------
     @FindBy(css = "[data-test-id='patient-data-search-input']")
     private WebElement searchInput;
@@ -301,6 +320,7 @@ public class PatientAdmissionPage extends BasePage {
                 reloadReceptionFresh();
                 collapseOpenNavDropdowns();
                 closeUnknownPatientModalIfOpen();
+                closeReservationModalIfOpen();
                 clickNew();
                 wait.until(d -> getArabicNameValue().isEmpty() && getMobileValue().isEmpty());
                 LOGGER.info("Isolated clean reception form ready (attempt {})", attempts);
@@ -338,6 +358,7 @@ public class PatientAdmissionPage extends BasePage {
         }
 
         closeUnknownPatientModalIfOpen();
+        closeReservationModalIfOpen();
         collapseOpenNavDropdowns();
         dismissVisibleToastsViaCloseButtons();
 
@@ -1194,6 +1215,53 @@ public class PatientAdmissionPage extends BasePage {
         LOGGER.info("Clicked New (جديد)");
     }
 
+    /**
+     * Clicks جديد and waits until the browser is on exact {@code /reception}
+     * (not {@code /reception/patient/{code}}).
+     */
+    public PatientAdmissionPage clickNewAndWaitForReceptionUrl() {
+        clickNew();
+        waitForExactReceptionUrl();
+        waitUntilLoaded();
+        LOGGER.info("After جديد, URL is exact /reception: {}", driver.getCurrentUrl());
+        return this;
+    }
+
+    /** Browser refresh of the current page (F5). */
+    public PatientAdmissionPage refreshCurrentPage() {
+        LOGGER.info("Refreshing current page: {}", driver.getCurrentUrl());
+        driver.navigate().refresh();
+        return this;
+    }
+
+    /**
+     * Refresh while on a patient profile and wait until the app redirects to
+     * exact {@code /reception}.
+     */
+    public PatientAdmissionPage refreshPatientProfileAndWaitForReceptionUrl() {
+        if (!isOnSavedPatientUrl()) {
+            throw new IllegalStateException(
+                    "Expected to be on /reception/patient/{code} before refresh. URL="
+                            + driver.getCurrentUrl());
+        }
+        refreshCurrentPage();
+        waitForExactReceptionUrl();
+        waitUntilLoaded();
+        LOGGER.info("After refresh on patient profile, URL is exact /reception: {}",
+                driver.getCurrentUrl());
+        return this;
+    }
+
+    /** True when URL is exactly {@code .../reception} (not a patient-detail URL). */
+    public boolean isOnExactReceptionUrl() {
+        return isExactReceptionUrl(driver.getCurrentUrl());
+    }
+
+    public PatientAdmissionPage waitForExactReceptionUrl() {
+        wait.until(d -> isExactReceptionUrl(d.getCurrentUrl()));
+        return this;
+    }
+
     // =========================================================
     // Unknown patient (مريض غير معروف) modal
     // =========================================================
@@ -1309,6 +1377,112 @@ public class PatientAdmissionPage extends BasePage {
         String value = code.getAttribute("value");
         return value == null ? "" : value.trim();
     }
+
+    // =========================================================
+    // Reservation Agenda Modal
+    // =========================================================
+
+    public PatientAdmissionPage openReservationAgenda() {
+        wait.until(ExpectedConditions.presenceOfElementLocated(RESERVATION_AGENDA_BTN));
+        clickThroughOverlays(RESERVATION_AGENDA_BTN);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(RESERVATION_MODAL_BACKDROP));
+        LOGGER.info("Opened Reservation Agenda modal");
+        return this;
+    }
+
+    public boolean isReservationModalDisplayed() {
+        List<WebElement> backdrops = driver.findElements(RESERVATION_MODAL_BACKDROP);
+        return !backdrops.isEmpty() && backdrops.get(0).isDisplayed();
+    }
+
+    public String getReservationFromDateValue() {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(RESERVATION_FROM_DATE_INPUT));
+        return input.getAttribute("value");
+    }
+
+    public String getReservationToDateValue() {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(RESERVATION_TO_DATE_INPUT));
+        return input.getAttribute("value");
+    }
+
+    public PatientAdmissionPage setReservationFromDate(String date) {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(RESERVATION_FROM_DATE_INPUT));
+        input.clear();
+        input.sendKeys(date);
+        // Fallback for different locales if clearing and typing doesn't set the value in yyyy-MM-dd
+        if (!date.equals(input.getAttribute("value")) && date.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            String[] parts = date.split("-");
+            String formattedDate = parts[2] + "-" + parts[1] + "-" + parts[0];
+            input.clear();
+            input.sendKeys(formattedDate);
+        }
+        LOGGER.info("Set reservation from date: {}", date);
+        return this;
+    }
+
+    public PatientAdmissionPage setReservationToDate(String date) {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(RESERVATION_TO_DATE_INPUT));
+        input.clear();
+        input.sendKeys(date);
+        if (!date.equals(input.getAttribute("value")) && date.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            String[] parts = date.split("-");
+            String formattedDate = parts[2] + "-" + parts[1] + "-" + parts[0];
+            input.clear();
+            input.sendKeys(formattedDate);
+        }
+        LOGGER.info("Set reservation to date: {}", date);
+        return this;
+    }
+
+    public PatientAdmissionPage clickReservationShowButton() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(RESERVATION_SHOW_BTN));
+        btn.click();
+        LOGGER.info("Clicked Reservation Show button (عرض)");
+        return this;
+    }
+
+    public int getReservationGridRowCount() {
+        wait.until(ExpectedConditions.presenceOfElementLocated(RESERVATION_TABLE_ROWS));
+        List<WebElement> rows = driver.findElements(RESERVATION_TABLE_ROWS);
+        if (rows.size() == 1) {
+            String text = rows.get(0).getText();
+            String html = rows.get(0).getAttribute("innerHTML");
+            if (text.contains("لا يوجد") || text.contains("empty-tab") || html.contains("empty-tab")) {
+                return 0;
+            }
+        }
+        return rows.size();
+    }
+
+    public boolean isReservationGridEmpty() {
+        return getReservationGridRowCount() == 0;
+    }
+
+    public PatientAdmissionPage waitForReservationGridRows(int expectedRows) {
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(d -> getReservationGridRowCount() == expectedRows);
+        return this;
+    }
+
+    public PatientAdmissionPage closeReservationModal() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(RESERVATION_CLOSE_BTN));
+        btn.click();
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(RESERVATION_MODAL_BACKDROP));
+        LOGGER.info("Closed Reservation Agenda modal");
+        return this;
+    }
+
+    public PatientAdmissionPage closeReservationModalIfOpen() {
+        try {
+            if (isReservationModalDisplayed()) {
+                closeReservationModal();
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not close reservation agenda modal: {}", e.getMessage());
+        }
+        return this;
+    }
+
 
     // =========================================================
     // Top action bar (patient selected / created)
