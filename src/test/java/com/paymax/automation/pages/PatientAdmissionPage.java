@@ -283,6 +283,7 @@ public class PatientAdmissionPage extends BasePage {
     public PatientAdmissionPage reloadReceptionFresh() {
         String receptionUrl = getReceptionUrl();
         LOGGER.info("Hard-reloading reception page: {}", receptionUrl);
+        dismissOverlaysAndToasts();
         driver.get(receptionUrl);
         wait.until(d -> isExactReceptionUrl(d.getCurrentUrl()));
         waitUntilLoaded();
@@ -290,12 +291,31 @@ public class PatientAdmissionPage extends BasePage {
         return this;
     }
 
-    /** Waits until the admission form is rendered. */
+    /** Waits until the admission form is rendered with retry and overlay dismissal. */
     public PatientAdmissionPage waitUntilLoaded() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("[data-test-id='patient-data-search-input']")));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("[data-test-id='patient-data-patient-name-input']")));
+        By searchInput = By.cssSelector("[data-test-id='patient-data-search-input']");
+        By nameInput = By.cssSelector("[data-test-id='patient-data-patient-name-input']");
+
+        for (int attempt = 1; attempt <= 2; attempt++) {
+            try {
+                WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(6));
+                shortWait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
+                shortWait.until(ExpectedConditions.visibilityOfElementLocated(nameInput));
+                return this;
+            } catch (TimeoutException te) {
+                LOGGER.warn("waitUntilLoaded attempt {} timed out waiting for search/name input; attempting recovery...", attempt);
+                dismissOverlaysAndToasts();
+                if (attempt == 1) {
+                    try {
+                        driver.navigate().refresh();
+                    } catch (Exception e) {
+                        driver.get(getReceptionUrl());
+                    }
+                }
+            }
+        }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(nameInput));
         return this;
     }
 
@@ -364,10 +384,12 @@ public class PatientAdmissionPage extends BasePage {
 
         try {
             ((JavascriptExecutor) driver).executeScript(
-                    "document.querySelectorAll('ng-dropdown-panel').forEach(p => p.remove());");
-            LOGGER.debug("Dismissed dropdown panels");
+                    "if (typeof Swal !== 'undefined' && Swal.close) { try { Swal.close(); } catch(e){} }"
+                            + "document.querySelectorAll('ng-dropdown-panel, .swal2-container, .modal-backdrop, .overlay-backdrop, .modal-backdrop-show').forEach(p => p.remove());"
+                            + "document.body.classList.remove('swal2-shown', 'swal2-height-auto', 'modal-open');");
+            LOGGER.debug("Dismissed dropdown panels, Swal modals, and backdrops");
         } catch (Exception e) {
-            LOGGER.debug("Could not JS-clear dropdown panels: {}", e.getMessage());
+            LOGGER.debug("Could not JS-clear dropdown panels/swal: {}", e.getMessage());
         }
         return this;
     }
@@ -1507,19 +1529,26 @@ public class PatientAdmissionPage extends BasePage {
     }
 
     /**
-     * Opens a patient profile by direct URL so the top action bar is available
-     * without going through search (useful between redirect assertions).
+     * Opens a patient profile by patient code so the top action bar is available.
+     * Uses search by code to avoid hard page reloads (which redirect to /reception in SPA).
      */
     public PatientAdmissionPage openPatientProfileByCode(String patientCode) {
         if (patientCode == null || patientCode.isBlank()) {
             throw new IllegalArgumentException("patientCode is required");
         }
-        String url = getReceptionUrl() + "/patient/" + patientCode.trim();
-        LOGGER.info("Opening patient profile by code: {}", url);
-        driver.get(url);
-        wait.until(ExpectedConditions.urlContains("/reception/patient/" + patientCode.trim()));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(ADMISSION_BTN));
-        return this;
+        String trimmedCode = patientCode.trim();
+        String expectedUrlPart = "/reception/patient/" + trimmedCode;
+
+        if (driver.getCurrentUrl() != null && driver.getCurrentUrl().contains(expectedUrlPart)) {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(ADMISSION_BTN));
+            return this;
+        }
+
+        if (!isExactReceptionUrl(driver.getCurrentUrl()) && !driver.getCurrentUrl().contains("/reception")) {
+            navigateToReception();
+        }
+
+        return openPatientProfileBySearch(trimmedCode);
     }
 
     /**

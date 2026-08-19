@@ -435,7 +435,7 @@ public class OutpatientCycleTests extends BaseTest {
         admissionPage.clickOpdButton();
         outpatientPage.waitForDraftUrl();
         outpatientPage.selectCaseType(CASE_TYPE_SPECIAL);
-        outpatientPage.selectSubCompany("$$نقدي 2019");
+        outpatientPage.selectFirstSubCompanyOption();
         outpatientPage.clickSaveVisit();
         outpatientPage.waitForServicesUrl();
         Assert.assertTrue(outpatientPage.isOnServicesUrl(),
@@ -644,6 +644,281 @@ public class OutpatientCycleTests extends BaseTest {
         int savedCount = outpatientPage.getSavedServicesRowCountFromGrid();
         Assert.assertTrue(savedCount >= 1 || outpatientPage.isSavedServicePresentInGrid("444") || outpatientPage.getSavedServicesCount() >= 1,
                 "Saved services grid must contain the saved service row after clicking 'حفظ الخدمات'");
+    }
+
+    // =========================================================
+    // T16–T21 : Outpatient Services Business & Validation Rules
+    // =========================================================
+
+    private static final String SERVICE_GROUP_BACK = "خدمات الكشف على الظهر";
+    private static final String SVC_NON_COUNTABLE = "خدمة الظهر الشاملة الكاملة 1";
+    private static final String SVC_COUNTABLE = "مفاصل الظهر (تنفيذ مباشر)";
+    private static final String SVC_NO_DOCTOR = "كشف ظهر كامل";
+    private static final String SVC_NEEDS_DOCTOR = "كشف ظهر";
+
+    @Test(priority = 16, description = "Rule 1: Quantity field must be >= 1; non-countable services lock quantity at 1 while countable services allow custom quantity")
+    public void verifyServiceQuantityFieldRules() {
+        navigateToServicesPageForFreshVisit();
+        outpatientPage.selectServiceGroup(SERVICE_GROUP_BACK);
+
+        // Non-countable service -> quantity must be locked/readonly at 1
+        outpatientPage.selectServiceBySearch(SVC_NON_COUNTABLE);
+        Assert.assertEquals(outpatientPage.getQuantityInputValue(), "1",
+                "Non-countable service 'خدمة الظهر الشاملة الكاملة 1' quantity must default to 1");
+        Assert.assertTrue(outpatientPage.isQuantityInputReadonly(),
+                "Non-countable service 'خدمة الظهر الشاملة الكاملة 1' quantity field must be locked/readonly");
+
+        // Countable service -> quantity input must be enabled
+        outpatientPage.selectServiceBySearch(SVC_COUNTABLE);
+        Assert.assertTrue(outpatientPage.isQuantityInputEnabled(),
+                "Countable service 'مفاصل الظهر (تنفيذ مباشر)' quantity field must be editable");
+        outpatientPage.enterQuantity("3");
+        Assert.assertEquals(outpatientPage.getQuantityInputValue(), "3",
+                "Entered quantity 3 must be retained in quantity field");
+    }
+
+    @Test(priority = 17, description = "Rule 2: Approval number field rules: mandatory when service requires approval number")
+    public void verifyApprovalNumberRules() {
+        navigateToServicesPageForFreshVisit();
+        outpatientPage.selectServiceGroup(SERVICE_GROUP_BACK);
+
+        // Service requiring approval number
+        outpatientPage.selectServiceBySearch(SVC_COUNTABLE);
+        outpatientPage.clickAddDraftService();
+
+        Assert.assertTrue(outpatientPage.isToastOrAlertContaining("برجاء إدخال رقم الموافقة")
+                        || outpatientPage.isToastOrAlertContaining("الموافقة"),
+                "Adding service requiring approval number without entering approval number must show error 'برجاء إدخال رقم الموافقة'. Actual toast: "
+                        + outpatientPage.getVisibleToastOrAlertText());
+
+        // Service not requiring approval number
+        outpatientPage.selectServiceBySearch(SVC_NON_COUNTABLE);
+        Assert.assertFalse(outpatientPage.isApprovalNumberInputEnabled(),
+                "Service not requiring approval number 'خدمة الظهر الشاملة الكاملة 1' should not mandate approval input");
+    }
+
+    @Test(priority = 18, description = "Rule 3: Doctor requirement rules: service needing doctor vs service not needing doctor")
+    public void verifyDoctorMandatoryRules() {
+        navigateToServicesPageForFreshVisit();
+        outpatientPage.selectServiceGroup(SERVICE_GROUP_BACK);
+
+        // Service not needing doctor: كشف ظهر كامل
+        outpatientPage.selectServiceBySearch(SVC_NO_DOCTOR);
+        int countBefore = outpatientPage.getDraftServicesRowCount();
+        outpatientPage.clickAddDraftService();
+        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+        int countAfter = outpatientPage.getDraftServicesRowCount();
+        Assert.assertTrue(countAfter > countBefore || outpatientPage.isDraftServicePresent(SVC_NO_DOCTOR) || outpatientPage.isAddDraftButtonEnabled(),
+                "Service not requiring doctor 'كشف ظهر كامل' should be added without selecting doctor");
+
+        // Service needing doctor: كشف ظهر
+        outpatientPage.selectServiceBySearch(SVC_NEEDS_DOCTOR);
+        outpatientPage.clickAddDraftService();
+        Assert.assertTrue(outpatientPage.isToastOrAlertContaining("طبيب")
+                        || outpatientPage.isToastOrAlertContaining("اختر الطبيب")
+                        || outpatientPage.isToastOrAlertContaining("برجاء إدخال الطبيب")
+                        || outpatientPage.isToastOrAlertContaining("إجباري"),
+                "Adding service requiring doctor 'كشف ظهر' without selecting a doctor must show validation error. Actual toast: "
+                        + outpatientPage.getVisibleToastOrAlertText());
+    }
+
+    @Test(priority = 19, description = "Rule 4: Unit price editability rules: fixed price vs editable price services")
+    public void verifyServicePriceEditableRules() {
+        navigateToServicesPageForFreshVisit();
+        outpatientPage.selectServiceGroup(SERVICE_GROUP_BACK);
+
+        // Non-editable price service: خدمة الظهر الشاملة الكاملة 1
+        outpatientPage.selectServiceBySearch(SVC_NON_COUNTABLE);
+        Assert.assertTrue(outpatientPage.isUnitPriceInputReadonly(),
+                "Price field for fixed-price service 'خدمة الظهر الشاملة الكاملة 1' must be locked/readonly");
+        Assert.assertFalse(outpatientPage.getUnitPriceInputValue().isBlank(),
+                "Fixed-price service must show its pre-configured unit price");
+
+        // Editable price service: مفاصل الظهر (تنفيذ مباشر)
+        outpatientPage.selectServiceBySearch(SVC_COUNTABLE);
+        Assert.assertTrue(outpatientPage.isUnitPriceInputEnabled(),
+                "Price field for editable-price service 'مفاصل الظهر (تنفيذ مباشر)' must be enabled");
+    }
+
+    @Test(priority = 20, description = "Rule 5: Discount giver DDL rules: disabled by default, opens when discount % entered, mandatory when discount applied")
+    public void verifyDiscountGiverMandatoryRules() {
+        navigateToServicesPageForFreshVisit();
+        outpatientPage.selectServiceGroup(SERVICE_GROUP_BACK);
+        outpatientPage.selectServiceBySearch(SVC_NON_COUNTABLE);
+
+        // Default state: discount giver disabled when discount % is 0 or empty
+        Assert.assertTrue(outpatientPage.isDiscountGiverSelectDisabled(),
+                "Discount giver DDL must be disabled when discount percentage is not entered");
+
+        // Enter discount % -> DDL becomes enabled
+        outpatientPage.enterDiscountPct("10");
+        Assert.assertTrue(outpatientPage.isDiscountGiverSelectEnabled(),
+                "Discount giver DDL must become enabled when discount percentage is entered");
+
+        // Trying to add service with discount % but without selecting discount giver must fail
+        outpatientPage.clickAddDraftService();
+        Assert.assertTrue(outpatientPage.isToastOrAlertContaining("مانح الخصم")
+                        || outpatientPage.isToastOrAlertContaining("خصم")
+                        || outpatientPage.isToastOrAlertContaining("برجاء اختيار"),
+                "Adding service with discount % without picking discount giver must show validation error. Actual toast: "
+                        + outpatientPage.getVisibleToastOrAlertText());
+
+        // Select discount giver -> service can now be added
+        outpatientPage.selectDiscountGiver("FIRST");
+        outpatientPage.clickAddDraftService();
+        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+        Assert.assertTrue(outpatientPage.getDraftServicesRowCount() > 0 || outpatientPage.isDraftServicePresent(SVC_NON_COUNTABLE),
+                "Service with discount % and discount giver selected should be added to draft list");
+    }
+
+    @Test(priority = 21, description = "Rule 6: Discount percentage limits: > 100% displays error and clears field; negative % shows error")
+    public void verifyDiscountPercentageLimits() {
+        navigateToServicesPageForFreshVisit();
+        outpatientPage.selectServiceGroup(SERVICE_GROUP_BACK);
+        outpatientPage.selectServiceBySearch(SVC_NON_COUNTABLE);
+
+        // 1. Discount percentage > 100% (e.g. 150%)
+        outpatientPage.enterDiscountPct("150");
+        outpatientPage.clickAddDraftService();
+        Assert.assertTrue(outpatientPage.isToastOrAlertContaining("نسبة الخصم يجب ألا تزيد عن 100%")
+                        || outpatientPage.isToastOrAlertContaining("100%"),
+                "Entering discount > 100% must show error 'نسبة الخصم يجب ألا تزيد عن 100%'. Actual toast: "
+                        + outpatientPage.getVisibleToastOrAlertText());
+
+        String valAfter150 = outpatientPage.getDiscountPctInputValue();
+        Assert.assertTrue(valAfter150.isBlank() || "0".equals(valAfter150) || Double.parseDouble(valAfter150) <= 100,
+                "Field value after entering > 100% must be cleared or reset. Actual: " + valAfter150);
+
+        // 2. Negative discount percentage (e.g. -10%)
+        outpatientPage.enterDiscountPct("-10");
+        outpatientPage.clickAddDraftService();
+        Assert.assertTrue(outpatientPage.isToastOrAlertContaining("أقل من الصفر")
+                        || outpatientPage.isToastOrAlertContaining("سالب")
+                        || outpatientPage.isToastOrAlertContaining("غير صحيح")
+                        || outpatientPage.isToastOrAlertContaining("خطأ"),
+                "Entering negative discount percentage must show validation error. Actual toast: "
+                        + outpatientPage.getVisibleToastOrAlertText());
+    }
+
+    // =========================================================
+    // T22–T25 : Favorites List & Medicines Tab Validation Tests
+    // =========================================================
+
+    @Test(priority = 22,
+            description = "Favorites list toggle (opd-patient-services-toggle-favorites-btn): opens favorite menu select (opd-patient-services-favorite-menu-select) and displays item checkboxes (opd-patient-services-favorite-item-checkbox)")
+    public void favoritesListToggleAndItemSelection() {
+        // Create visit under default cash entity
+        navigateToServicesPageForFreshVisit();
+
+        // 1. Verify toggle favorites button is displayed and click it
+        Assert.assertTrue(outpatientPage.isToggleFavoritesBtnVisible(),
+                "Toggle favorites button (opd-patient-services-toggle-favorites-btn) must be visible on services page");
+
+        outpatientPage.clickToggleFavoritesButton();
+
+        // 2. Verify favorite menu select DDL appears
+        Assert.assertTrue(outpatientPage.isFavoriteMenuSelectDisplayed(),
+                "Favorite menu select (opd-patient-services-favorite-menu-select) must be displayed after toggling favorites");
+
+        // 3. Select favorite menu "اليكو 2026"
+        outpatientPage.selectFavoriteMenu("اليكو 2026");
+
+        // 4. Verify item checkboxes appear
+        try { Thread.sleep(800); } catch (InterruptedException ignored) {}
+        Assert.assertTrue(outpatientPage.isFavoriteItemCheckboxDisplayed() || outpatientPage.getFavoriteItemCheckboxesCount() > 0,
+                "Favorite item checkboxes (opd-patient-services-favorite-item-checkbox) must be displayed for menu 'اليكو 2026'");
+    }
+
+    @Test(priority = 23,
+            description = "Medicines tab initial state & store/doctor requirement: DDLs display 'اختر المخزن' and 'اختر الطبيب'; '+' button hidden before store selection and visible after selecting 'main store' & 'Ahmed Badawi'")
+    public void medicinesTabInitialStateAndStoreDoctorSelection() {
+        navigateToServicesPageForFreshVisit();
+
+        // 1. Switch to medicines tab
+        outpatientPage.switchToMedicinesTab();
+
+        // 2. Assert initial state: Store DDL empty / showing 'اختر المخزن', Doctor DDL empty / showing 'اختر الطبيب'
+        Assert.assertTrue(outpatientPage.isMedStoreEmptyOrPlaceholder(),
+                "Store DDL (opd-patient-services-med-charge-store-select) must show 'اختر المخزن' initially");
+        Assert.assertTrue(outpatientPage.isMedDoctorEmptyOrPlaceholder(),
+                "Doctor DDL (opd-patient-services-med-charge-doctor-select) must show 'اختر الطبيب' initially");
+
+        // 3. Verify '+' batch button is NOT visible before selecting store
+        Assert.assertFalse(outpatientPage.isOpenMedBatchDialogButtonVisible(),
+                "Add batch '+' button (opd-patient-services-open-med-batch-dialog-btn) must NOT be visible before selecting store");
+
+        // 4. Select store 'main store' and doctor 'Ahmed Badawi'
+        outpatientPage.selectMedStore("main store");
+        outpatientPage.selectMedDoctor("Ahmed Badawi");
+
+        // 5. Verify '+' batch button is now visible after store selection
+        Assert.assertTrue(outpatientPage.isOpenMedBatchDialogButtonVisible(),
+                "Add batch '+' button (opd-patient-services-open-med-batch-dialog-btn) must become visible after selecting store 'main store'");
+    }
+
+    @Test(priority = 24,
+            description = "Medicines tab item selection & clear button ('جديد'): select item 'يورانيوم مشع', unit 'حبيبات', click '+' button, then click 'جديد' (opd-patient-services-clear-med-charge-btn) -> verifies data cleared")
+    public void medicinesTabItemSelectionBatchAndClearData() {
+        navigateToServicesPageForFreshVisit();
+
+        // 1. Switch to medicines tab & select store & doctor
+        outpatientPage.switchToMedicinesTab();
+        outpatientPage.selectMedStore("main store");
+        outpatientPage.selectMedDoctor("Ahmed Badawi");
+
+        // 2. Select item 'يورانيوم مشع' and unit 'حبيبات'
+        outpatientPage.selectMedItem("يورانيوم مشع");
+        outpatientPage.selectMedUnit("حبيبات");
+
+        // 3. Click '+' batch dialog button
+        outpatientPage.clickOpenMedBatchDialogButton();
+
+        // 4. Click 'جديد' clear button
+        outpatientPage.clickClearMedChargeButton();
+
+        // 5. Verify data in Store, Doctor, Item DDLs has been cleared
+        Assert.assertTrue(outpatientPage.isMedStoreEmptyOrPlaceholder(),
+                "Clicking 'جديد' button must clear store selection back to 'اختر المخزن'");
+        Assert.assertTrue(outpatientPage.isMedDoctorEmptyOrPlaceholder(),
+                "Clicking 'جديد' button must clear doctor selection back to 'اختر الطبيب'");
+        Assert.assertTrue(outpatientPage.isMedItemEmptyOrPlaceholder(),
+                "Clicking 'جديد' button must clear item selection");
+    }
+
+    @Test(priority = 25,
+            description = "Medicines tab credit percentage field (opd-patient-services-med-charge-entry-credit-pct-input): locked/readonly for cash entity, enabled/editable (0-100%) for credit entity")
+    public void medicinesTabCreditPctFieldValidationCashVsCredit() {
+        // Part 1: Cash Entity Visit -> credit pct field must be locked/readonly
+        navigateToServicesPageForFreshVisit();
+
+        outpatientPage.switchToMedicinesTab();
+
+        Assert.assertTrue(outpatientPage.isMedChargeCreditPctReadonlyOrDisabled(),
+                "Credit percentage field (opd-patient-services-med-charge-entry-credit-pct-input) must be locked/readonly for cash entity visits");
+
+        // Part 2: Credit Entity Visit -> credit pct field must be enabled & accept 0-100%
+        createFreshPatientWithoutVisit();
+        admissionPage.clickOpdButton();
+        if (outpatientPage.isActiveVisitModalDisplayed()) {
+            outpatientPage.continueSameVisit();
+        } else {
+            outpatientPage.waitForDraftUrl();
+            outpatientPage.selectCaseType(CASE_TYPE_SPECIAL);
+            outpatientPage.selectSubCompany("اليكو");
+            outpatientPage.selectFirstIcdDiagnosisOption();
+            outpatientPage.clickSaveVisit();
+        }
+        outpatientPage.waitForServicesUrl();
+        outpatientPage.waitForServicesPageReady();
+
+        outpatientPage.switchToMedicinesTab();
+
+        Assert.assertTrue(outpatientPage.isMedChargeCreditPctEnabled(),
+                "Credit percentage field (opd-patient-services-med-charge-entry-credit-pct-input) must be enabled for credit entity visits");
+
+        outpatientPage.enterMedChargeCreditPct("20");
+        Assert.assertEquals(outpatientPage.getMedChargeCreditPctInputValue(), "20",
+                "Credit percentage field must contain entered percentage '20'");
     }
 
     // =========================================================

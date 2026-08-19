@@ -199,6 +199,27 @@ public class OutpatientPage extends BasePage {
     // ---------- Add service form ----------
     private static final By TOGGLE_FAVORITES_BTN = By.cssSelector(
             "[data-test-id='opd-patient-services-toggle-favorites-btn']");
+    private static final By FAVORITE_MENU_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-favorite-menu-select']");
+    private static final By FAVORITE_ITEM_CHECKBOX = By.cssSelector(
+            "[data-test-id='opd-patient-services-favorite-item-checkbox']");
+
+    // ---------- Medicines & Supplies tab (صرف الادوية والمستلزمات) ----------
+    private static final By MED_CHARGE_STORE_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-med-charge-store-select']");
+    private static final By MED_CHARGE_DOCTOR_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-med-charge-doctor-select']");
+    private static final By MED_CHARGE_ITEM_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-med-charge-item-select']");
+    private static final By MED_CHARGE_UNIT_SELECT = By.cssSelector(
+            "[data-test-id='opd-patient-services-med-charge-unit-select'],"
+                    + "[data-test-id='opd-patient-services-med-charge-item-unit-select']");
+    private static final By OPEN_MED_BATCH_DIALOG_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-open-med-batch-dialog-btn']");
+    private static final By MED_CHARGE_CREDIT_PCT_INPUT = By.cssSelector(
+            "[data-test-id='opd-patient-services-med-charge-entry-credit-pct-input']");
+    private static final By CLEAR_MED_CHARGE_BTN = By.cssSelector(
+            "[data-test-id='opd-patient-services-clear-med-charge-btn']");
     private static final By SERVICE_GROUP_SELECT = By.cssSelector(
             "[data-test-id='opd-patient-services-service-group-select']");
     private static final By SHORT_CODE_INPUT = By.cssSelector(
@@ -213,12 +234,24 @@ public class OutpatientPage extends BasePage {
             "[data-test-id='opd-patient-services-cash-per-unit-input']");
     private static final By QUANTITY_INPUT = By.cssSelector(
             "[data-test-id='opd-patient-services-quantity-input']");
+    private static final By QUANTITY_BY_LABEL = By.xpath(
+            "//label[contains(normalize-space(.),'العدد')]"
+                    + "/following::input[1]");
     private static final By DISCOUNT_PCT_INPUT = By.cssSelector(
             "[data-test-id='opd-patient-services-discount-pct-input']");
+    private static final By DISCOUNT_PCT_BY_LABEL = By.xpath(
+            "//label[contains(normalize-space(.),'ن الخصم') or contains(normalize-space(.),'الخصم %')]"
+                    + "/following::input[1]");
     private static final By DISCOUNT_AMOUNT_INPUT = By.cssSelector(
             "[data-test-id='opd-patient-services-discount-amount-input']");
     private static final By DISCOUNT_GIVER_SELECT = By.cssSelector(
             "[data-test-id='opd-patient-services-discount-giver-select']");
+    private static final By DISCOUNT_GIVER_BY_LABEL = By.xpath(
+            "//label[contains(normalize-space(.),'مانح الخصم')]"
+                    + "/following::*[self::ng-select or contains(@class,'ng-select')][1]");
+    private static final By UNIT_PRICE_BY_LABEL = By.xpath(
+            "//label[contains(normalize-space(.),'السعر') or contains(normalize-space(.),'سعر الوحذ')]"
+                    + "/following::input[1]");
     private static final By SERVICE_NOTES_INPUT = By.cssSelector(
             "[data-test-id='opd-patient-services-notes-input']");
     private static final By ADD_DRAFT_BTN = By.cssSelector(
@@ -1007,6 +1040,135 @@ public class OutpatientPage extends BasePage {
     public boolean isCreditPerUnitReadonly(){ return isFieldReadonly(CREDIT_PER_UNIT_INPUT); }
     public boolean isCashPerUnitReadonly()  { return isFieldReadonly(CASH_PER_UNIT_INPUT); }
 
+    public boolean isUnitPriceInputReadonly() {
+        try {
+            WebElement input = resolve(UNIT_PRICE_INPUT, UNIT_PRICE_BY_LABEL);
+            String readonly = input.getAttribute("readonly");
+            String disabled = input.getAttribute("disabled");
+            return readonly != null || disabled != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isUnitPriceInputEnabled() {
+        return !isUnitPriceInputReadonly();
+    }
+
+    public boolean isQuantityInputReadonly() {
+        try {
+            WebElement input = resolve(QUANTITY_INPUT, QUANTITY_BY_LABEL);
+            String readonly = input.getAttribute("readonly");
+            String disabled = input.getAttribute("disabled");
+            return readonly != null || disabled != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isQuantityInputEnabled() {
+        return !isQuantityInputReadonly();
+    }
+
+    public String getQuantityInputValue() {
+        try {
+            WebElement input = resolve(QUANTITY_INPUT, QUANTITY_BY_LABEL);
+            return input.getAttribute("value");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public OutpatientPage enterQuantity(String quantity) {
+        WebElement input = resolve(QUANTITY_INPUT, QUANTITY_BY_LABEL);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", input);
+        input.clear();
+        input.sendKeys(quantity);
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));"
+                        + "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", input);
+        LOGGER.info("Entered quantity: {}", quantity);
+        return this;
+    }
+
+    public OutpatientPage enterDiscountPct(String pct) {
+        WebElement input = resolve(DISCOUNT_PCT_INPUT, DISCOUNT_PCT_BY_LABEL);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", input);
+        input.clear();
+        input.sendKeys(pct);
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));"
+                        + "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));"
+                        + "arguments[0].dispatchEvent(new Event('blur', { bubbles: true }));", input);
+        LOGGER.info("Entered discount percentage: {}", pct);
+        return this;
+    }
+
+    public String getDiscountPctInputValue() {
+        try {
+            WebElement input = resolve(DISCOUNT_PCT_INPUT, DISCOUNT_PCT_BY_LABEL);
+            return input.getAttribute("value");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public boolean isDiscountGiverSelectDisabled() {
+        try {
+            WebElement select = resolve(DISCOUNT_GIVER_SELECT, DISCOUNT_GIVER_BY_LABEL);
+            String disabled = select.getAttribute("disabled");
+            String cls = select.getAttribute("class");
+            return disabled != null || (cls != null && cls.contains("ng-select-disabled"));
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    public boolean isDiscountGiverSelectEnabled() {
+        return !isDiscountGiverSelectDisabled();
+    }
+
+    public OutpatientPage selectDiscountGiver(String giverText) {
+        WebElement select = resolve(DISCOUNT_GIVER_SELECT, DISCOUNT_GIVER_BY_LABEL);
+        if (giverText == null || giverText.isBlank() || "FIRST".equalsIgnoreCase(giverText)) {
+            selectFirstNgOption(select);
+        } else {
+            selectNgOption(select, giverText);
+        }
+        LOGGER.info("Selected discount giver: {}", giverText);
+        return this;
+    }
+
+    public String getVisibleToastOrAlertText() {
+        try {
+            List<WebElement> els = driver.findElements(By.xpath(
+                    "//*[contains(@class,'toast-item') or contains(@class,'toast-message') or contains(@class,'swal2-html-container') or contains(@class,'p-toast-detail') or contains(@class,'alert') or contains(@class,'toast')]"));
+            for (WebElement el : els) {
+                if (el.isDisplayed() && el.getText() != null && !el.getText().isBlank()) {
+                    return el.getText().trim();
+                }
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
+
+    public boolean isToastOrAlertContaining(String expectedFragment) {
+        try {
+            List<WebElement> els = driver.findElements(By.xpath(
+                    "//*[contains(@class,'toast-item') or contains(@class,'toast-message') or contains(@class,'swal2-html-container') or contains(@class,'p-toast-detail') or contains(@class,'alert') or contains(@class,'toast')]"));
+            return els.stream().anyMatch(e -> {
+                try {
+                    String text = e.getText();
+                    return e.isDisplayed() && text != null && text.contains(expectedFragment);
+                } catch (Exception ex) {
+                    return false;
+                }
+            });
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     // =========================================================
     // T8 — Add Service Full Flow
     // =========================================================
@@ -1574,6 +1736,262 @@ public class OutpatientPage extends BasePage {
     }
 
     // =========================================================
+    // Favorites (اظهار المفضلة والقوائم المفضلة)
+    // =========================================================
+
+    public OutpatientPage clickToggleFavoritesButton() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(TOGGLE_FAVORITES_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn);
+        try {
+            btn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+        }
+        LOGGER.info("Clicked toggle favorites button (opd-patient-services-toggle-favorites-btn)");
+        waitForFavoriteMenuSelect();
+        return this;
+    }
+
+    public OutpatientPage waitForFavoriteMenuSelect() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(FAVORITE_MENU_SELECT));
+        return this;
+    }
+
+    public boolean isFavoriteMenuSelectDisplayed() {
+        try {
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(FAVORITE_MENU_SELECT)).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public OutpatientPage selectFavoriteMenu(String menuName) {
+        waitForFavoriteMenuSelect();
+        WebElement select = wait.until(ExpectedConditions.elementToBeClickable(FAVORITE_MENU_SELECT));
+        if (menuName == null || menuName.isBlank() || "FIRST".equalsIgnoreCase(menuName)) {
+            selectFirstNgOption(select);
+        } else {
+            selectNgOption(select, menuName);
+        }
+        LOGGER.info("Selected favorite menu: {}", menuName);
+        return this;
+    }
+
+    public List<WebElement> getFavoriteItemCheckboxes() {
+        try {
+            return new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(ExpectedConditions.presenceOfAllElementsLocatedBy(FAVORITE_ITEM_CHECKBOX));
+        } catch (Exception e) {
+            return driver.findElements(FAVORITE_ITEM_CHECKBOX);
+        }
+    }
+
+    public int getFavoriteItemCheckboxesCount() {
+        return getFavoriteItemCheckboxes().size();
+    }
+
+    public boolean isFavoriteItemCheckboxDisplayed() {
+        try {
+            return new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(d -> {
+                        List<WebElement> boxes = d.findElements(FAVORITE_ITEM_CHECKBOX);
+                        return !boxes.isEmpty() && boxes.stream().anyMatch(WebElement::isDisplayed);
+                    });
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public OutpatientPage selectFirstFavoriteItemCheckbox() {
+        List<WebElement> boxes = getFavoriteItemCheckboxes();
+        if (!boxes.isEmpty()) {
+            WebElement box = boxes.get(0);
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", box);
+            if (!box.isSelected()) {
+                try {
+                    box.click();
+                } catch (Exception e) {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", box);
+                }
+            }
+        }
+        return this;
+    }
+
+    // =========================================================
+    // Medicines & Supplies Tab (صرف الادوية والمستلزمات)
+    // =========================================================
+
+    public OutpatientPage switchToMedicinesTab() {
+        clickTab("opd-patient-services-medicines-tab-btn");
+        LOGGER.info("Switched to Medicines & Supplies tab");
+        return this;
+    }
+
+    public String getSelectedMedStoreText() {
+        try {
+            WebElement select = driver.findElement(MED_CHARGE_STORE_SELECT);
+            List<WebElement> labels = select.findElements(By.cssSelector(".ng-value-label, .ng-value, .ng-placeholder"));
+            if (!labels.isEmpty()) {
+                return labels.get(0).getText().trim();
+            }
+            return select.getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public boolean isMedStoreEmptyOrPlaceholder() {
+        String text = getSelectedMedStoreText();
+        return text.contains("اختر المخزن") || text.isEmpty() || !isNgSelectHasValue(MED_CHARGE_STORE_SELECT);
+    }
+
+    public String getSelectedMedDoctorText() {
+        try {
+            WebElement select = driver.findElement(MED_CHARGE_DOCTOR_SELECT);
+            List<WebElement> labels = select.findElements(By.cssSelector(".ng-value-label, .ng-value, .ng-placeholder"));
+            if (!labels.isEmpty()) {
+                return labels.get(0).getText().trim();
+            }
+            return select.getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public boolean isMedDoctorEmptyOrPlaceholder() {
+        String text = getSelectedMedDoctorText();
+        return text.contains("اختر الطبيب") || text.isEmpty() || !isNgSelectHasValue(MED_CHARGE_DOCTOR_SELECT);
+    }
+
+    public String getSelectedMedItemText() {
+        try {
+            WebElement select = driver.findElement(MED_CHARGE_ITEM_SELECT);
+            List<WebElement> labels = select.findElements(By.cssSelector(".ng-value-label, .ng-value, .ng-placeholder"));
+            if (!labels.isEmpty()) {
+                return labels.get(0).getText().trim();
+            }
+            return select.getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public boolean isMedItemEmptyOrPlaceholder() {
+        String text = getSelectedMedItemText();
+        return text.isEmpty() || text.contains("اختر") || !isNgSelectHasValue(MED_CHARGE_ITEM_SELECT);
+    }
+
+    private boolean isNgSelectHasValue(By locator) {
+        try {
+            WebElement select = driver.findElement(locator);
+            List<WebElement> val = select.findElements(By.cssSelector(".ng-value"));
+            return !val.isEmpty() && val.stream().anyMatch(WebElement::isDisplayed);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public OutpatientPage selectMedStore(String storeName) {
+        WebElement select = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_STORE_SELECT));
+        selectNgOption(select, storeName);
+        LOGGER.info("Selected medicine store: {}", storeName);
+        return this;
+    }
+
+    public OutpatientPage selectMedDoctor(String doctorName) {
+        WebElement select = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_DOCTOR_SELECT));
+        selectNgOption(select, doctorName);
+        LOGGER.info("Selected medicine doctor: {}", doctorName);
+        return this;
+    }
+
+    public OutpatientPage selectMedItem(String itemName) {
+        WebElement select = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_ITEM_SELECT));
+        selectNgOption(select, itemName);
+        LOGGER.info("Selected medicine item: {}", itemName);
+        return this;
+    }
+
+    public OutpatientPage selectMedUnit(String unitName) {
+        try {
+            WebElement select = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_UNIT_SELECT));
+            selectNgOption(select, unitName);
+            LOGGER.info("Selected medicine unit: {}", unitName);
+        } catch (Exception e) {
+            LOGGER.warn("Could not find unit select by test-id; trying label fallback: {}", e.getMessage());
+            By fallback = By.xpath("//label[contains(normalize-space(.),'الوحدة')]/following::*[self::ng-select or contains(@class,'ng-select')][1]");
+            WebElement select = wait.until(ExpectedConditions.elementToBeClickable(fallback));
+            selectNgOption(select, unitName);
+        }
+        return this;
+    }
+
+    public boolean isOpenMedBatchDialogButtonVisible() {
+        List<WebElement> btns = driver.findElements(OPEN_MED_BATCH_DIALOG_BTN);
+        return !btns.isEmpty() && btns.stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    public OutpatientPage clickOpenMedBatchDialogButton() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(OPEN_MED_BATCH_DIALOG_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn);
+        try {
+            btn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+        }
+        LOGGER.info("Clicked open med batch dialog (+) button");
+        return this;
+    }
+
+    public boolean isMedChargeCreditPctReadonlyOrDisabled() {
+        try {
+            WebElement input = driver.findElement(MED_CHARGE_CREDIT_PCT_INPUT);
+            String readonly = input.getAttribute("readonly");
+            String disabled = input.getAttribute("disabled");
+            return readonly != null || disabled != null;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    public boolean isMedChargeCreditPctEnabled() {
+        return !isMedChargeCreditPctReadonlyOrDisabled();
+    }
+
+    public OutpatientPage enterMedChargeCreditPct(String pct) {
+        WebElement input = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_CREDIT_PCT_INPUT));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", input);
+        input.clear();
+        input.sendKeys(pct);
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));"
+                        + "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", input);
+        LOGGER.info("Entered medicine charge credit percentage: {}", pct);
+        return this;
+    }
+
+    public String getMedChargeCreditPctInputValue() {
+        try {
+            return driver.findElement(MED_CHARGE_CREDIT_PCT_INPUT).getAttribute("value");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public OutpatientPage clickClearMedChargeButton() {
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(CLEAR_MED_CHARGE_BTN));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn);
+        try {
+            btn.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+        }
+        LOGGER.info("Clicked clear med charge (جديد) button");
+        return this;
+    }
+
+    // =========================================================
     // Internals
     // =========================================================
 
@@ -1616,10 +2034,43 @@ public class OutpatientPage extends BasePage {
         closeOpenNgDropdownPanels();
         WebElement select = wait.until(ExpectedConditions.elementToBeClickable(ngSelect));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", select);
-        select.click();
+        try {
+            select.click();
+        } catch (Exception e) {
+            LOGGER.info("Direct click on ng-select intercepted by toast/overlay; using JS click");
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", select);
+        }
 
         String cleanKeyword = optionText.replaceAll("^[#@$]+", "").trim();
 
+        // 1. Try finding a matching option directly from the open panel BEFORE typing filter
+        try {
+            List<WebElement> options = new WebDriverWait(driver, Duration.ofSeconds(3))
+                    .until(ExpectedConditions.presenceOfNestedElementsLocatedBy(
+                            By.cssSelector("ng-dropdown-panel, .ng-dropdown-panel"),
+                            By.cssSelector(".ng-option:not(.ng-option-disabled)")));
+
+            for (WebElement opt : options) {
+                String text = opt.getText();
+                if (text != null && (text.trim().equals(optionText)
+                        || text.contains(optionText)
+                        || text.contains(cleanKeyword)
+                        || (optionText.contains("نقدي") && text.contains("نقدي")))) {
+                    try {
+                        opt.click();
+                    } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", opt);
+                    }
+                    closeOpenNgDropdownPanels();
+                    LOGGER.info("Selected ng-option directly: {}", text);
+                    return;
+                }
+            }
+        } catch (Exception ignored) {
+            // Dropdown panel may need typing filter if options list is long / lazy loaded
+        }
+
+        // 2. Filter using inner input if direct pick didn't find a match
         try {
             WebElement innerInput = select.findElement(By.cssSelector("input[role='combobox'], input[type='text'], .ng-input input"));
             if (innerInput.getAttribute("readonly") == null) {
@@ -1638,19 +2089,19 @@ public class OutpatientPage extends BasePage {
                 "//ng-dropdown-panel//*[contains(@class,'ng-option')][contains(normalize-space(),'" + cleanKeyword + "')]");
 
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(exactOption)).click();
+            clickOptionElement(exactOption);
             closeOpenNgDropdownPanels();
             return;
         } catch (Exception ignored) {}
 
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(containsOption)).click();
+            clickOptionElement(containsOption);
             closeOpenNgDropdownPanels();
             return;
         } catch (Exception ignored) {}
 
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(cleanOption)).click();
+            clickOptionElement(cleanOption);
             closeOpenNgDropdownPanels();
             return;
         } catch (Exception ignored) {}
@@ -1692,6 +2143,16 @@ public class OutpatientPage extends BasePage {
         }
 
         closeOpenNgDropdownPanels();
+    }
+
+    private void clickOptionElement(By locator) {
+        WebElement opt = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", opt);
+        try {
+            opt.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", opt);
+        }
     }
 
     private void selectFirstNgOption(WebElement ngSelect) {
