@@ -886,17 +886,19 @@ public class OutpatientCycleTests extends BaseTest {
     }
 
     @Test(priority = 25,
-            description = "Medicines tab credit percentage field (opd-patient-services-med-charge-entry-credit-pct-input): locked/readonly for cash entity, enabled/editable (0-100%) for credit entity")
-    public void medicinesTabCreditPctFieldValidationCashVsCredit() {
-        // Part 1: Cash Entity Visit -> credit pct field must be locked/readonly
+            description = "Medicines tab credit percentage field (opd-patient-services-med-charge-entry-credit-pct-input): locked/readonly for cash entity visits")
+    public void medicinesTabCreditPctReadonlyForCashEntity() {
         navigateToServicesPageForFreshVisit();
 
         outpatientPage.switchToMedicinesTab();
 
         Assert.assertTrue(outpatientPage.isMedChargeCreditPctReadonlyOrDisabled(),
                 "Credit percentage field (opd-patient-services-med-charge-entry-credit-pct-input) must be locked/readonly for cash entity visits");
+    }
 
-        // Part 2: Credit Entity Visit -> credit pct field must be enabled & accept 0-100%
+    @Test(priority = 26,
+            description = "Medicines tab credit percentage field (opd-patient-services-med-charge-entry-credit-pct-input): enabled/editable (0-100%) for credit entity visits ('اليكو')")
+    public void medicinesTabCreditPctEditableForCreditEntity() {
         createFreshPatientWithoutVisit();
         admissionPage.clickOpdButton();
         if (outpatientPage.isActiveVisitModalDisplayed()) {

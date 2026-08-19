@@ -284,7 +284,17 @@ public class PatientAdmissionPage extends BasePage {
         String receptionUrl = getReceptionUrl();
         LOGGER.info("Hard-reloading reception page: {}", receptionUrl);
         dismissOverlaysAndToasts();
-        driver.get(receptionUrl);
+        String currentUrl = driver.getCurrentUrl();
+        if (currentUrl != null && currentUrl.contains("/clinic/visits/")) {
+            try {
+                WebElement link = driver.findElement(By.xpath("//a[@href='/reception']"));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
+            } catch (Exception e) {
+                driver.get(receptionUrl);
+            }
+        } else {
+            driver.get(receptionUrl);
+        }
         wait.until(d -> isExactReceptionUrl(d.getCurrentUrl()));
         waitUntilLoaded();
         collapseOpenNavDropdowns();
