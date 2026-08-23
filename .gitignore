@@ -12,3 +12,8 @@ Thumbs.db
 
 # Secrets — copy from config.example.properties locally
 src/test/resources/config.properties
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class

@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Generate Paymax_Test_Cases_Register.xlsx — master bilingual test-case register."""
+"""
+Generate master bilingual test-case registers:
+- Paymax Automation Test Cases-Aug16-2026.xlsx
+- Paymax_Test_Cases_Register.xlsx
+"""
 
 from datetime import date
-
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.worksheet.datavalidation import DataValidation
 
-OUT = r"d:\Ma3n\Automation Test For new Paymax\Paymax_Test_Cases_Register.xlsx"
+OUT_EXCEL = r"d:\Ma3n\Automation Test For new Paymax\Paymax Automation Test Cases-Aug16-2026.xlsx"
 
 HEADER_FILL = PatternFill("solid", fgColor="1F4E79")
 HEADER_FONT = Font(bold=True, color="FFFFFF", name="Calibri", size=11)
@@ -38,16 +41,41 @@ HEADERS = [
     "Notes",
 ]
 
+MODULE_AUTH_EN = "Authentication & Bridge Navigation"
+MODULE_AUTH_AR = "تسجيل الدخول والتنقل للنظام الجديد"
+
 MODULE_ADM_EN = "Patient Admission / Medical File (Reception)"
 MODULE_ADM_AR = "الملف الطبي / استقبال المريض (مكتب الدخول)"
+
 MODULE_OPD_EN = "Outpatient Visits (OPD Clinics)"
 MODULE_OPD_AR = "العيادات الخارجية"
+
+SUITE_LOGIN = "LoginTest"
 SUITE_ADMISSION = "PatientAdmissionTests"
 SUITE_ACTION_BAR = "PatientActionBarTests"
 SUITE_OPD = "OutpatientCycleTests"
+
 TODAY = date.today().isoformat()
 
 CASES = [
+    # -------------------------------------------------------------
+    # Module: Authentication / System Entry
+    # -------------------------------------------------------------
+    (
+        "TC-AUTH-001",
+        "Login via legacy bridge and navigate to new Paymax home",
+        "تسجيل الدخول عبر النظام القديم والانتقال لواجهة Paymax الجديدة",
+        "Authenticate via legacy system login bridge and verify successful navigation to new Paymax home on port 4040 with valid page title.",
+        "تسجيل الدخول عبر بوابة النظام القديم والتأكد من فتح الصفحة الرئيسية للنظام الجديد على المنفذ 4040 وعنوان صفحة صحيح.",
+        "Smoke",
+        "High",
+        "Automated",
+        "verifyLoginAndNavigateToNewSystem",
+    ),
+
+    # -------------------------------------------------------------
+    # Module: Patient Admission / Reception (TC-ADM-001 to 027)
+    # -------------------------------------------------------------
     (
         "TC-ADM-001",
         "Happy path: create a patient with mandatory fields (unique 4-word Arabic name)",
@@ -150,9 +178,9 @@ CASES = [
     (
         "TC-ADM-010",
         "New (جديد) must clear all inputs and reset dropdowns",
-        "زرار «جديد» يمسح كل الحقول ويرجع القوائم المنسدلة للافتراضي",
-        "Click New and verify that all inputs are cleared and dropdowns reset to default.",
-        "الضغط على زرار جديد والتحقق من مسح كل الحقول وإعادة ضبط القوائم المنسدلة.",
+        "زرار جديد يفرغ كل الحقول ويعيد ضبط القوائم المنسدلة",
+        "Click New (جديد) and verify all inputs are cleared and dropdowns reset to default.",
+        "الضغط على جديد والتحقق من تفريغ كافة الحقول وإعادة ضبط القوائم المنسدلة للوضع الافتراضي.",
         "Positive",
         "High",
         "Automated",
@@ -161,9 +189,9 @@ CASES = [
     (
         "TC-ADM-011",
         "Search by patient code then open the matching result (temporary)",
-        "البحث بكود المريض ثم فتح النتيجة المطابقة (مؤقت)",
-        "Search by patient code, open the matching dropdown result, and verify patient data is populated. (Temporary workaround)",
-        "البحث بكود المريض وفتح النتيجة من القائمة والتحقق من تعبئة بيانات المريض. (حل مؤقت)",
+        "البحث بكود المريض وفتح النتيجة المطابقة (مؤقت)",
+        "Search by patient code, click the matching dropdown result, and verify fields populate.",
+        "البحث بكود المريض والضغط على النتيجة من القائمة والتحقق من ملء بيانات المريض في الحقول.",
         "Positive",
         "High",
         "Automated",
@@ -172,20 +200,20 @@ CASES = [
     (
         "TC-ADM-012",
         "Created-by and created-date fields must be read-only",
-        "حقلا «أُنشئ بواسطة» و«تاريخ الإنشاء» للقراءة فقط",
-        "Verify that created-by and created-date fields are read-only.",
-        "التحقق من أن حقلي أُنشئ بواسطة وتاريخ الإنشاء للقراءة فقط.",
-        "Positive",
-        "Medium",
+        "حقول المنشئ وتاريخ الإنشاء للقراءة فقط",
+        "Verify that created-by and created-date fields are read-only and reject manual input.",
+        "التحقق من أن حقول المنشئ وتاريخ الإنشاء محمية ولا تقبل الكتابة اليدوية.",
+        "Negative",
+        "Low",
         "Automated",
         "createdByAndCreatedDateAreReadOnly",
     ),
     (
         "TC-ADM-013",
         "Header date must match the actual current local date",
-        "تاريخ الـ Header يطابق تاريخ اليوم الفعلي",
-        "Verify that the header date displayed matches the current local system date.",
-        "التحقق من أن التاريخ الظاهر في الـ Header يطابق تاريخ الجهاز الحالي.",
+        "تاريخ الهيدر يطابق التاريخ الحالي الفعلي",
+        "Verify the date displayed in the reception header matches today's local system date.",
+        "التحقق من أن التاريخ المعروض في أعلى الصفحة يطابق التاريخ المحلي لجهاز المستخدم اليوم.",
         "Positive",
         "Low",
         "Automated",
@@ -194,31 +222,31 @@ CASES = [
     (
         "TC-ADM-014",
         "TC8: Single-word Arabic name must show ERROR on Save",
-        "TC8: اسم عربي من كلمة واحدة يظهر Error عند الحفظ",
-        "Save a patient with a single-word Arabic name and verify an ERROR message is shown.",
-        "حفظ مريض باسم عربي من كلمة واحدة والتحقق من ظهور رسالة Error.",
+        "TC8: اسم عربي أحادي يظهر خطأ عند الحفظ",
+        "Enter a single-word Arabic name and attempt to save; verify an error message is displayed.",
+        "إدخال اسم عربي من كلمة واحدة ومحاولة الحفظ، والتحقق من ظهور رسالة خطأ.",
         "Negative",
-        "High",
+        "Medium",
         "Automated",
         "singleWordNameShowsErrorOnSave",
     ),
     (
         "TC-ADM-015",
         "TC9: Two/three-word Arabic name shows WARNING + SUCCESS on Save",
-        "TC9: اسم ثنائي/ثلاثي يظهر Warning + Success عند الحفظ (ويُقبل)",
-        "Fill mandatory fields with a 2/3-word Arabic name, save, and verify both WARNING and SUCCESS appear (save is allowed).",
-        "ملء الحقول الإجبارية باسم ثنائي/ثلاثي والحفظ والتحقق من ظهور Warning و Success معًا (الحفظ مسموح).",
+        "TC9: اسم عربي ثنائي أو ثلاثي يظهر تحذير ويحفظ بنجاح",
+        "Enter a 2 or 3 word Arabic name; verify warning appears and save succeeds.",
+        "إدخال اسم عربي ثنائي أو ثلاثي والتحقق من ظهور تحذير مع إمكانية الحفظ بنجاح.",
         "Positive",
-        "High",
+        "Medium",
         "Automated",
         "twoOrThreeWordNameShowsWarningOnBlur",
     ),
     (
         "TC-ADM-016",
         "TC10: Four-word Arabic name is accepted (Success)",
-        "TC10: اسم رباعي يُقبل بنجاح (Success)",
-        "Save a patient with a four-word Arabic name and verify successful save (Success).",
-        "حفظ مريض باسم عربي رباعي والتحقق من نجاح الحفظ (Success).",
+        "TC10: اسم عربي رباعي يقبل بنجاح وبدون تحذيرات",
+        "Enter a complete 4-word Arabic name and verify save succeeds without warnings.",
+        "إدخال اسم عربي رباعي كامل والتحقق من قبول الحفظ بنجاح بدون تحذيرات على الاسم.",
         "Positive",
         "High",
         "Automated",
@@ -227,9 +255,9 @@ CASES = [
     (
         "TC-ADM-017",
         "Full happy path: fill all mandatory + optional fields and save",
-        "Happy Path كامل: ملء كل الحقول الإجبارية والاختيارية ثم الحفظ",
-        "Fill all mandatory and optional fields then save and verify success.",
-        "ملء كل الحقول الإجبارية والاختيارية ثم الحفظ والتحقق من النجاح.",
+        "المسار السعيد الكامل: ملء كافة الحقول الإجبارية والاختيارية والحفظ",
+        "Fill every available field (mandatory + optional) and verify patient is saved cleanly.",
+        "ملء كل الحقول المتاحة في شاشة الدخول (الإجبارية والاختيارية) والتحقق من حفظ المريض بالكامل.",
         "Positive",
         "High",
         "Automated",
@@ -238,9 +266,9 @@ CASES = [
     (
         "TC-ADM-018",
         "Full form reset: New clears all filled inputs and dropdowns",
-        "إعادة ضبط كاملة: زرار «جديد» يمسح كل الحقول بعد الملء",
-        "Fill the full form then click New and verify everything is cleared/reset.",
-        "ملء الفورم بالكامل ثم الضغط على جديد والتحقق من مسح/إعادة ضبط كل شيء.",
+        "إعادة ضبط كاملة: جديد يفرغ كل الحقول والقوائم المنسدلة",
+        "Fill all fields, click New (جديد), and verify every single input is cleared and dropdown reset.",
+        "ملء جميع حقول الشاشة ثم الضغط على جديد والتأكد من تصفير كل الحقول والقوائم بدون استثناء.",
         "Positive",
         "Medium",
         "Automated",
@@ -249,9 +277,9 @@ CASES = [
     (
         "TC-ADM-019",
         "Age years auto-calculate to 10 when DOB is exactly 10 years ago",
-        "السن يُحسب تلقائيًا = 10 لما تاريخ الميلاد يبقى من 10 سنين بالظبط",
-        "Set DOB to exactly 10 years ago and verify age years equals 10.",
-        "ضبط تاريخ الميلاد ليكون قبل 10 سنوات بالضبط والتحقق أن السن = 10.",
+        "حساب السن تلقائيًا 10 سنوات عند إدخال تاريخ ميلاد قبل 10 سنوات",
+        "Set date of birth to exactly 10 years ago and verify age years field auto-populates 10.",
+        "إدخال تاريخ ميلاد قبل 10 سنوات بدقة والتحقق من حساب خانة السن تلقائيًا بـ 10 سنوات.",
         "Positive",
         "Medium",
         "Automated",
@@ -260,9 +288,9 @@ CASES = [
     (
         "TC-ADM-020",
         "Credit company requires insurance number + expiry on Save (error when empty)",
-        "جهة الائتمان تطلب رقم التأمين والانتهاء عند الحفظ (Error لو فاضيين)",
-        "Select credit company without insurance number/expiry and verify error on save.",
-        "اختيار جهة الائتمان بدون رقم التأمين/الانتهاء والتحقق من ظهور Error عند الحفظ.",
+        "جهة الائتمان تطلب رقم التأمين وتاريخ الانتهاء عند الحفظ (خطأ عند تركها فارغة)",
+        "Select a credit entity and leave insurance fields empty; verify save is blocked with validation.",
+        "اختيار جهة ائتمان وترك حقول التأمين فارغة ثم الضغط على حفظ والتحقق من ظهور رسائل المنع.",
         "Negative",
         "High",
         "Automated",
@@ -271,21 +299,21 @@ CASES = [
     (
         "TC-ADM-021",
         "Created-by and created-date are readonly and reject typing",
-        "حقلا الإنشاء readonly وبيرفضوا الكتابة",
-        "Attempt to type into created-by / created-date and verify the fields reject modification.",
-        "محاولة الكتابة في حقلي الإنشاء والتحقق من رفض التعديل.",
+        "حقول المنشئ وتاريخ الإنشاء للقراءة فقط وترفض الكتابة",
+        "Attempt to type into created-by and created-date fields; verify input is rejected.",
+        "محاولة الكتابة داخل حقول المنشئ وتاريخ الإنشاء والتأكد من رفض الإدخال تمامًا.",
         "Negative",
-        "Medium",
+        "Low",
         "Automated",
         "readOnlyFieldsRejectModification",
     ),
     (
         "TC-ADM-022",
         "Unknown patient modal: auto-generated patient code is read-only",
-        "بوب أب المريض غير المعروف: كود المريض المولّد تلقائيًا للقراءة فقط",
-        "Open the unknown-patient modal and verify the patient code input is displayed and readonly/disabled.",
-        "فتح بوب أب المريض غير المعروف والتحقق من ظهور حقل كود المريض وأنه readonly أو disabled.",
-        "Positive",
+        "نافذة مريض غير معلوم: كود المريض المنشأ تلقائيًا للقراءة فقط",
+        "Open the unknown patient modal and verify patient-code input is disabled/readonly.",
+        "فتح نافذة تسجيل مريض غير معلوم والتحقق من أن حقل كود المريض محمي ولا يمكن تعديله.",
+        "Negative",
         "Medium",
         "Automated",
         "unknownPatientCodeIsReadOnly",
@@ -293,9 +321,9 @@ CASES = [
     (
         "TC-ADM-023",
         "Unknown patient modal: happy path save shows a success message",
-        "بوب أب المريض غير المعروف: الحفظ الناجح يظهر رسالة Success",
-        "Open the modal, set gender and visit date/time, save, and verify a SUCCESS message appears.",
-        "فتح البوب أب وتحديد الجنس وتاريخ ووقت الزيارة والحفظ والتحقق من ظهور رسالة Success.",
+        "نافذة مريض غير معلوم: الحفظ بنجاح يظهر رسالة تأكيد",
+        "Fill unknown patient form with required data, click save, and verify success message.",
+        "ملء بيانات مريض غير معلوم والضغط على حفظ والتحقق من ظهور رسالة النجاح وإغلاق النافذة.",
         "Positive",
         "High",
         "Automated",
@@ -304,53 +332,57 @@ CASES = [
     (
         "TC-ADM-024",
         "Unknown patient modal: X button closes the modal",
-        "بوب أب المريض غير المعروف: زرار X يقفل البوب أب",
-        "Open the modal, click the close (X) button, and verify the modal is no longer visible.",
-        "فتح البوب أب والضغط على زرار الإغلاق (X) والتحقق من اختفاء البوب أب.",
+        "نافذة مريض غير معلوم: زرار الإغلاق (X) يغلق النافذة",
+        "Open unknown patient modal, click the close (X) button, and verify modal disappears.",
+        "فتح نافذة مريض غير معلوم والضغط على زرار الإغلاق X والتأكد من اختفاء النافذة تمامًا.",
         "Positive",
-        "Medium",
+        "Low",
         "Automated",
         "closeUnknownPatientModal",
     ),
     (
         "TC-ADM-025",
         "Default الجهة value is $$نقدي 2019 on a fresh admission page",
-        "القيمة الافتراضية للجهة هي $$نقدي 2019 عند فتح الصفحة",
-        "Reload the admission page and assert الجهة defaults to $$نقدي 2019.",
-        "إعادة تحميل صفحة الاستقبال والتحقق أن الجهة الافتراضية = $$نقدي 2019.",
+        "القيمة الافتراضية للجهة هي $$نقدي 2019 عند فتح شاشة الدخول",
+        "Open a fresh admission page and verify the client (الجهة) dropdown defaults to $$نقدي 2019.",
+        "فتح شاشة دخول جديدة والتأكد من أن القيمة المختارة تلقائيًا في حقل الجهة هي $$نقدي 2019.",
         "Positive",
-        "High",
+        "Medium",
         "Automated",
         "defaultClientDropdownValueIsCash2019",
     ),
     (
         "TC-ADM-026",
         "Identity type selection updates the adjacent ID-number field label",
-        "اختيار إثبات الشخصية يحدّث عنوان حقل الرقم المجاور",
-        "Select جواز سفر from إثبات الشخصية and assert the adjacent field label becomes جواز سفر.",
-        "اختيار جواز سفر من إثبات الشخصية والتحقق أن عنوان الحقل المجاور يصبح جواز سفر.",
+        "اختيار نوع إثبات الشخصية يحدث عنوان حقل رقم الإثبات المجاور",
+        "Change identity type (e.g. جواز سفر) and verify the adjacent ID input label changes dynamically.",
+        "تغيير نوع إثبات الشخصية (مثل جواز سفر) والتحقق من تحديث التسمية التوضيحية لحقل الرقم المجاور.",
         "Positive",
-        "High",
+        "Medium",
         "Automated",
         "identityTypeUpdatesAdjacentFieldLabel",
     ),
     (
         "TC-ADM-027",
         "نوع التعاقد defaults to العضو نفسه; DDL has العضو نفسه/مريض تابع; dependent defaults درجة القرابة",
-        "نوع التعاقد افتراضيًا العضو نفسه؛ القائمة فيها العضو نفسه/مريض تابع؛ ومريض تابع يضبط درجة القرابة",
-        "After credit جهة + شركة فرعية: assert نوع التعاقد enabled and defaults to العضو نفسه; open DDL and assert exactly العضو نفسه + مريض تابع; with العضو نفسه درجة القرابة stays disabled; select مريض تابع and assert درجة القرابة defaults to الزوج/الزوجة (readonly).",
-        "بعد اختيار جهة آجل وشركة فرعية: التحقق أن نوع التعاقد مفعّل والافتراضي العضو نفسه؛ فتح القائمة والتحقق من وجود اختيارين فقط العضو نفسه ومريض تابع؛ مع العضو نفسه درجة القرابة تبقى معطّلة؛ اختيار مريض تابع والتحقق أن درجة القرابة الافتراضية الزوج/الزوجة (readonly).",
+        "نوع التعاقد يبدأ بالعضو نفسه؛ القائمة تحتوي (العضو نفسه/مريض تابع)؛ مريض تابع يحدد درجة القرابة",
+        "Select credit entity, verify contract type enables with default العضو نفسه and options; choose مريض تابع and verify relative degree opens.",
+        "اختيار جهة آجل والتحقق من فتح نوع التعاقد بالافتراضي 'العضو نفسه'، واختيار 'مريض تابع' والتحقق من ظهور درجة القرابة الزوج/الزوجة.",
         "Positive",
         "High",
         "Automated",
         "cascadingContractAndDependentPatientRules",
     ),
+
+    # -------------------------------------------------------------
+    # Module: Top Action Bar (TC-ADM-028 to 032)
+    # -------------------------------------------------------------
     (
         "TC-ADM-028",
         "Top action bar: each active button redirects with dynamic patientCode",
-        "شريط الإجراءات: كل زر نشط يوجّه برابط فيه كود المريض الديناميكي",
-        "Open a patient profile and click دخول / عيادات خارجية / الأشعة / تحاليل / إسعاف وطوارئ; assert each URL matches the expected path and includes the dynamic patientCode (and clientId=52 where applicable).",
-        "فتح بروفايل المريض والضغط على دخول / عيادات خارجية / الأشعة / تحاليل / إسعاف وطوارئ والتحقق أن كل رابط يطابق المسار المتوقع ويحتوي كود المريض الديناميكي (وclientId=52 عند اللزوم).",
+        "شريط الإجراءات العلوي: كل زرار نشط يوجه للرابط المطلوب مع كود المريض",
+        "Open a patient and click each top action button (عيادات، داخلي، طوارئ، أشعة، معامل، أسنان، عمليات، علاج طبيعي) and verify URL structure.",
+        "فتح ملف مريض والضغط على أزرار شريط الإجراءات والتحقق من التوجيه للرابط المناسب حاملاً كود المريض.",
         "Positive",
         "High",
         "Automated",
@@ -359,31 +391,31 @@ CASES = [
     (
         "TC-ADM-029",
         "Top action bar: Patient Barcode opens popup with /print/barcode?id={code}",
-        "شريط الإجراءات: باركود المريض يفتح نافذة منبثقة /print/barcode?id={code}",
-        "Click باركود المريض, switch to the popup window, assert URL contains /print/barcode?id={patientCode}, close popup, and return to the main window (avoid getting stuck on native print dialog).",
-        "الضغط على باركود المريض والتبديل للنافذة المنبثقة والتحقق أن الرابط يحتوي /print/barcode?id={كود المريض} ثم إغلاق النافذة والرجوع للنافذة الرئيسية دون التعطل على دايلوج الطباعة.",
+        "شريط الإجراءات العلوي: باركود المريض يفتح نافذة منبثقة برابط الطباعة",
+        "Click the barcode button on action bar, verify a popup opens with /print/barcode?id={code}, and close it safely.",
+        "الضغط على زرار باركود المريض والتحقق من فتح نافذة طباعة بالرابط الصحيح ثم إغلاقها بنجاح.",
         "Positive",
-        "High",
+        "Medium",
         "Automated",
         "verifyPatientBarcodePopupWindow",
     ),
     (
         "TC-ADM-030",
         "Top action bar: under-development buttons stay inactive / do not break the app",
-        "شريط الإجراءات: أزرار قيد التطوير تبقى غير نشطة ولا تكسر التطبيق",
-        "With a patient open, verify قسطرة / غسيل كلى / المناظير / الأرشيف are inactive or leave the patient profile intact when clicked.",
-        "مع فتح مريض، التحقق أن قسطرة / غسيل كلى / المناظير / الأرشيف غير نشطة أو تبقى على بروفايل المريض عند الضغط عليها.",
-        "Negative",
-        "Medium",
+        "شريط الإجراءات العلوي: الأزرار تحت التطوير تظل غير مفعلة ولا تكسر التطبيق",
+        "Verify placeholder action buttons (قسطرة، غسيل كلى، المناظير، الأرشيف) do not cause application crash or incorrect navigation.",
+        "التحقق من أن الأزرار غير المكتملة لا تسبب أخطاء في التطبيق وتظل في وضع الخمول بأمان.",
+        "Positive",
+        "Low",
         "Automated",
         "verifyUnderDevelopmentActionButtonsDoNotBreakApp",
     ),
     (
         "TC-ADM-031",
         "External visit family (OPD/Rays/Lab): switching modes keeps the same visit code",
-        "عائلة الزيارة الخارجية (عيادات/أشعة/تحاليل): التنقل بينهم يحافظ على نفس كود الزيارة",
-        "For seeded patients already in OPD (30499) / Rays (30485) / Lab (30456), open the other external modes and assert كود الزيارة stays the same (mode changes in the URL only).",
-        "لمرضى جاهزين في زيارة خارجي 30499 / أشعة 30485 / تحاليل 30456، فتح باقي أوضاع الزيارة الخارجية والتحقق أن كود الزيارة ثابت (يتغير الـmode في الرابط فقط).",
+        "عائلة الزيارات الخارجية: التنقل بين العيادات والأشعة والمعامل يحتفظ بنفس كود الزيارة",
+        "Open a patient with an active OPD visit and switch between Rays/Lab; verify the system maintains the same visit code.",
+        "فتح مريض لديه زيارة عيادات والتنقل للأشعة أو المعامل والتحقق من الاحتفاظ بنفس كود الزيارة المفتوحة.",
         "Positive",
         "High",
         "Automated",
@@ -392,86 +424,46 @@ CASES = [
     (
         "TC-ADM-032",
         "Incompatible active visit: switching visit type shows ERROR and stays on profile",
-        "زيارة نشطة غير متوافقة: تغيير نوع الزيارة يظهر Error ويبقى على البروفايل",
-        "For patients already in Inpatient (30496), Emergency (30495), or External family trying دخول/إسعاف: click an incompatible action and assert an ERROR toast and no navigation away from the patient profile.",
-        "لمرضى في داخلي 30496 أو طوارئ 30495 أو زيارة خارجية يحاولون دخول/إسعاف: الضغط على إجراء غير متوافق والتحقق من ظهور رسالة Error وعدم مغادرة بروفايل المريض.",
+        "الزيارة النشطة غير المتوافقة: محاولة التحويل تظهر رسالة خطأ وتبقى في صفحة المريض",
+        "Attempt to open an incompatible visit mode (e.g. Inpatient when OPD open) and verify error alert blocks transition.",
+        "محاولة فتح نوع زيارة غير متوافق (مثل داخلي أثناء وجود زيارة خارجية) والتحقق من ظهور رسالة خطأ تمنع التحويل.",
         "Negative",
         "High",
         "Automated",
         "verifyIncompatibleVisitSwitchShowsError",
     ),
+
+    # -------------------------------------------------------------
+    # Module: Reception Navigation & Agenda (TC-ADM-033 to 036)
+    # -------------------------------------------------------------
     (
         "TC-ADM-033",
         "Refresh on selected patient (/reception/patient/{code}) redirects to /reception",
-        "عمل Refresh وصفحة مريض مختار (/reception/patient/{code}) يرجع إلى /reception",
-        "Open/save a patient so URL is /reception/patient/{code}, refresh the browser, and assert the URL becomes exact /reception (not the patient detail URL).",
-        "فتح/حفظ مريض بحيث يكون الرابط /reception/patient/{code}، عمل Refresh، والتحقق أن الرابط يصبح /reception بالظبط (مش صفحة تفاصيل المريض).",
+        "إعادة تحميل الصفحة على مريض محدد توجه تلقائيًا إلى /reception",
+        "Navigate to a saved patient URL and refresh browser; verify URL cleans up and redirects to base /reception route.",
+        "فتح رابط مريض محفوظ وعمل Refresh للمتصفح والتأكد من إعادة التوجيه للرابط الرئيسي /reception.",
         "Positive",
-        "High",
+        "Medium",
         "Automated",
         "refreshOnPatientProfileRedirectsToReception",
     ),
     (
         "TC-ADM-034",
         "New (جديد) on selected patient navigates to exact /reception",
-        "زرار جديد على مريض مختار يوجّه إلى /reception",
-        "With a selected patient URL /reception/patient/{code}, click جديد and assert navigation to exact /reception.",
-        "مع مريض مختار على /reception/patient/{code}، الضغط على جديد والتحقق من الانتقال إلى /reception بالظبط.",
+        "الضغط على جديد في شاشة مريض محدد ينتقل إلى /reception مباشرة",
+        "On an open patient profile, click New (جديد) and verify navigation to exact /reception URL and form reset.",
+        "أثناء فتح بيانات مريض محدد، الضغط على جديد والتأكد من الانتقال إلى الرابط /reception وتفريغ الشاشة لمريض جديد.",
         "Positive",
-        "High",
+        "Medium",
         "Automated",
         "newButtonOnPatientProfileNavigatesToReception",
     ),
     (
-        "TC-OPD-001",
-        "Draft OPD visit: fill نوع الحالة + الشركة الفرعية, save → /services",
-        "مسودة زيارة خارجية: ملء نوع الحالة والشركة الفرعية ثم الحفظ → /services",
-        "Create/open a clean patient, click عيادات خارجية, assert draft URL (mode=opd), fill نوع الحالة + الشركة الفرعية, save, and assert URL becomes /clinic/visits/{visitCode}/services.",
-        "إنشاء/فتح مريض نظيف، الضغط على عيادات خارجية، التحقق من رابط المسودة mode=opd، ملء نوع الحالة والشركة الفرعية والحفظ، والتحقق أن الرابط يصبح /clinic/visits/{كود الزيارة}/services.",
-        "Positive",
-        "High",
-        "Automated",
-        "createDraftVisitAndTransitionToServices",
-    ),
-    (
-        "TC-OPD-002",
-        "Active visit modal: continue same visit → services page",
-        "بوب أب الزيارة المفتوحة: الإستكمال على نفس الزيارة → صفحة الخدمات",
-        "Open patient 30499, click عيادات خارجية, assert open-visit modal, click patient-data-continue-same-visit-btn, assert /clinic/visits/{visitCode}/services.",
-        "فتح مريض 30499، الضغط على عيادات خارجية، التحقق من بوب أب الزيارة المفتوحة، الضغط على الإستكمال على نفس الزيارة، والتحقق من /clinic/visits/{كود الزيارة}/services.",
-        "Positive",
-        "High",
-        "Automated",
-        "activeVisitModalContinueExisting",
-    ),
-    (
-        "TC-OPD-003",
-        "Close open visit blocked when unpaid — confirm نعم then تنبيه لم تُدفع بعد",
-        "إغلاق الزيارة المفتوحة يُمنع لو الزيارة غير مدفوعة — تأكيد نعم ثم تنبيه",
-        "Open unpaid patient 30552, click عيادات خارجية, click close-open-visit, confirm نعم on Swal, assert تنبيه message contains تعذر إغلاق الزيارة / لم تُدفع بعد, dismiss with حسناً, stay on patient profile.",
-        "فتح مريض غير مدفوع 30552، عيادات خارجية، إغلاق الزيارة المفتوحة، تأكيد نعم، التحقق من تنبيه تعذر إغلاق الزيارة بسبب عدم الدفع، حسناً، والبقاء على بروفايل المريض.",
-        "Negative",
-        "High",
-        "Automated",
-        "closeVisitBlockedWhenVisitUnpaid",
-    ),
-    (
-        "TC-OPD-004",
-        "Add service inside saved visit and verify الإجمالي updates",
-        "إضافة خدمة داخل زيارة محفوظة والتحقق من تحديث الإجمالي",
-        "Inside a saved OPD visit, add a service and assert الإجمالي increases. (Deferred until business steps are clarified.)",
-        "داخل زيارة خارجية محفوظة، إضافة خدمة والتحقق أن الإجمالي يزيد. (موقوف مؤقتًا لحين توضيح الخطوات.)",
-        "Positive",
-        "High",
-        "Planned",
-        "addServiceAndVerifyTotalUpdates",
-    ),
-    (
         "TC-ADM-035",
         "Reservation Agenda modal opens with current dates (from/to)",
-        "نافذة أجندة الحجوزات تفتح بالتاريخ الحالي (من/إلى)",
-        "Open Reservation Agenda modal and verify default dates (from/to) are set to today's date.",
-        "فتح نافذة أجندة الحجوزات والتحقق من ضبط تاريخ البداية والنهاية افتراضيًا على تاريخ اليوم.",
+        "نافذة أجندة الحجوزات تفتح بالتواريخ الحالية تلقائيًا (من / إلى = اليوم)",
+        "Click the reservation agenda button and verify modal opens with From and To date fields defaulting to today's date.",
+        "الضغط على زرار أجندة الحجوزات والتحقق من فتح النافذة وتعيين حقول تاريخ 'من' و 'إلى' على تاريخ اليوم الحالي.",
         "Positive",
         "High",
         "Automated",
@@ -480,42 +472,90 @@ CASES = [
     (
         "TC-ADM-036",
         "Reservation Agenda search by specific date returns matching results",
-        "البحث في أجندة الحجوزات بتاريخ محدد يظهر النتيجة المطابقة",
-        "Search reservations for specific date 2026-08-08 and verify exact row count in the grid.",
-        "البحث في أجندة الحجوزات بتاريخ محدد (2026-08-08) والتحقق من ظهور العدد المطابق في الجدول.",
+        "البحث في أجندة الحجوزات بتاريخ محدد يرجع الحجوزات المطابقة",
+        "Set date filters in reservation agenda modal to a specific target date (2026-08-08), click show, and verify grid row results.",
+        "تحديد تاريخ محدد (2026-08-08) في فلتر نافذة الأجندة والضغط على عرض والتأكد من ظهور نتيجة الحجز في الجدول.",
         "Positive",
         "High",
         "Automated",
         "verifyReservationSearchBySpecificDate",
     ),
+
+    # -------------------------------------------------------------
+    # Module: Outpatient Visits (OPD) — Cycle & Core (TC-OPD-001 to 011)
+    # -------------------------------------------------------------
     (
-        "TC-OPD-005",
-        "Services page header title and summary chips verification",
-        "التحقق من عنوان الهيدر ومؤشرات ملخص صفحة الخدمات",
-        "Verify patient name title and summary chips (total, paid, insurance %, remaining, services count) on services page.",
-        "التحقق من اسم المريض في العنوان ومؤشرات الملخص (الإجمالي، المدفوع، التأمين، المتبقي، عدد الخدمات) في صفحة الخدمات.",
+        "TC-OPD-001",
+        "Draft OPD visit creation: fill case type + sub-company, save -> /services",
+        "إنشاء زيارة عيادات خارجية مسودة: ملء نوع الحالة والشركة الفرعية والحفظ -> صفحة الخدمات",
+        "Start an OPD visit from reception, fill required draft fields (نوع الحالة, الشركة الفرعية), click save and verify redirection to /clinic/visits/{code}/services.",
+        "بدء زيارة خارجية من الاستقبال وملء الحقول الإجبارية للمسودة وحفظها والتأكد من الانتقال لصفحة خدمات الزيارة.",
         "Positive",
         "High",
         "Automated",
-        "verifyServicesPageHeaderAndSummaryChips",
+        "createDraftVisitAndTransitionToServices",
+    ),
+    (
+        "TC-OPD-002",
+        "Active visit modal: continue same visit opens services page",
+        "نافذة الزيارة المفتوحة: اختيار الاستكمال على نفس الزيارة يفتح صفحة الخدمات",
+        "When attempting to open OPD for a patient with an existing active visit, click 'الاستكمال على نفس الزيارة' and verify services page opens.",
+        "عند فتح زيارة لمريض لديه زيارة مفتوحة بالفعل، اختيار زر الاستكمال على نفس الزيارة والتأكد من فتح صفحة الخدمات مباشرة.",
+        "Positive",
+        "High",
+        "Automated",
+        "activeVisitModalContinueExisting",
+    ),
+    (
+        "TC-OPD-003",
+        "Close unpaid visit is blocked with warning message",
+        "إغلاق زيارة غير مسددة ممنوع وتظهر رسالة تنبيه بعدم السداد",
+        "Attempt to close an unpaid active visit, confirm in SweetAlert modal, and verify the system blocks closure with alert 'بسبب أن الزيارة لم تُدفع بعد'.",
+        "محاولة إغلاق زيارة لم تسدد خدماتها وتأكيد الإغلاق والتحقق من منع النظام للإغلاق وظهور تنبيه بعدم السداد.",
+        "Negative",
+        "High",
+        "Automated",
+        "closeVisitBlockedWhenVisitUnpaid",
+    ),
+    (
+        "TC-OPD-004",
+        "Add service to visit and verify total amount updates correctly",
+        "إضافة خدمة للزيارة والتحقق من تحديث الإجمالي بشكل صحيح",
+        "Add a billable service to an open OPD visit and verify that total amount chip and services grid reflect the added cost.",
+        "إضافة خدمة بقيمة مالية للزيارة والتحقق من تحديث إجمالي الزيارة وجدول الخدمات المحسوبة.",
+        "Positive",
+        "High",
+        "Planned",
+        "addServiceAndVerifyTotalUpdates",
+    ),
+    (
+        "TC-OPD-005",
+        "Services page header title and summary chips verification",
+        "التحقق من هيدر صفحة الخدمات وبطاقات الملخص (الإجمالي، المدفوع، نسبة التحمل، المتبقي، عدد الخدمات)",
+        "Open OPD services page and verify visit header, patient info card, visit code, unpaid status badge, and financial summary chips.",
+        "فتح صفحة خدمات العيادات والتحقق من كارت بيانات المريض وكود الزيارة وشارة حالة السداد وبطاقات الإجمالي والمدفوع والمتبقي.",
+        "Positive",
+        "High",
+        "Automated",
+        "servicesPageLoadsWithCorrectData",
     ),
     (
         "TC-OPD-006",
         "Services tabs active state and badge counts",
-        "تبويبات صفحة الخدمات والشارات الرقمية",
-        "Verify الخدمات tab is active by default and badge shows initial count (0) on fresh visit.",
-        "التحقق أن تبويب الخدمات نشط افتراضيًا والشارة تظهر العدد الأولي (0) عند فتح زيارة جديدة.",
+        "حالة تبويبات صفحة الخدمات وشارات العدادات (الخدمات، الأشعة، التحاليل، صرف الأدوية)",
+        "Verify all 4 OPD tabs are visible, 'الخدمات' tab is active by default, and tab badges reflect correct service counts.",
+        "التحقق من ظهور التبويبات الأربعة واختيار تبويب الخدمات افتراضيًا ومطابقة عدادات التبويبات للبيانات.",
         "Positive",
         "Medium",
         "Automated",
-        "verifyServicesTabsAndBadges",
+        "allTabsVisibleAndServicesTabActiveByDefault",
     ),
     (
         "TC-OPD-007",
         "Add service form initial state and price field restrictions",
-        "الحالة الأولية لنموذج إضافة خدمة وقيود أسعار الخدمات",
-        "Verify إضافة للقائمة button disabled, prices read-only, favorites button visible, and empty message shown.",
-        "التحقق من تعطيل زرار إضافة للقائمة، وأن أسعار الخدمة للقراءة فقط، وزرار المفضلة ظاهر ورسالة لا توجد خدمات تظهر.",
+        "الحالة الأولية لفورم إضافة خدمة وحماية حقول الأسعار",
+        "Verify 'إضافة' button is disabled before selecting service, price fields are read-only, and favorites button is visible.",
+        "التحقق من تعطيل زر الإضافة قبل اختيار الخدمة وحماية حقول الأسعار من التعديل اليدوي وظهور زر المفضلة.",
         "Positive",
         "Medium",
         "Automated",
@@ -525,8 +565,8 @@ CASES = [
         "TC-OPD-008",
         "Add service to visit and save visit info",
         "إضافة خدمة للزيارة وحفظ بيانات الزيارة",
-        "Select service/doctor/clinic, click add to list, save visit info, and verify successful save.",
-        "اختيار الخدمة والطبيب والعيادة، الضغط على إضافة للقائمة، حفظ بيانات الزيارة والتحقق من الحفظ بنجاح.",
+        "Select service group, service, doctor, clinic, click add to draft list, and click save visit info.",
+        "اختيار مجموعة الخدمات والخدمة والطبيب والعيادة وإضافتها للقائمة ثم حفظ بيانات الزيارة بنجاح.",
         "Positive",
         "High",
         "Automated",
@@ -534,19 +574,19 @@ CASES = [
     ),
     (
         "TC-OPD-009",
-        "Save visit info button shows success toast notification",
-        "الضغط على حفظ بيانات الزيارة يظهر توست النجاح",
-        "Click حفظ (save visit info) button and verify success toast notification appears.",
-        "الضغط على زرار حفظ بيانات الزيارة والتحقق من ظهور رسالة النجاح (Toast).",
+        "Save visit info button success toast notification",
+        "زرار حفظ بيانات الزيارة يظهر إشعار نجاح",
+        "Click 'حفظ بيانات الزيارة' and verify toast notification confirms successful save and page remains on services.",
+        "الضغط على زرار حفظ بيانات الزيارة والتحقق من ظهور إشعار Toast بنجاح الحفظ وبقاء المستخدم في صفحة الخدمات.",
         "Positive",
-        "High",
+        "Medium",
         "Automated",
         "saveVisitInfoShowsSuccessToast",
     ),
     (
         "TC-OPD-010",
-        "OPD visit payment flow generates receipt and updates history table",
-        "سداد خدمات الزيارة الخارجية ينشئ إيصالاً ويحدّث جدول الإيصالات",
+        "OPD visit payment flow (receipt created and added to history table)",
+        "دورة سداد زيارة العيادات (إنشاء إيصال السداد وإضافته لجدول سجل المدفوعات)",
         "Submit payment for visit services and verify a new receipt row appears in the payment history table.",
         "تنفيذ سداد خدمات الزيارة والتحقق من إضافة صف إيصال جديد في جدول سجل الإيصالات.",
         "Positive",
@@ -565,6 +605,10 @@ CASES = [
         "Automated",
         "backButtonNavigatesFromServicesPage",
     ),
+
+    # -------------------------------------------------------------
+    # Module: Outpatient Visits (OPD) — Advanced Validation (TC-OPD-012 to 018)
+    # -------------------------------------------------------------
     (
         "TC-OPD-012",
         "Service group filter limits available clinics",
@@ -642,57 +686,176 @@ CASES = [
         "Automated",
         "completeServicesDraftAndSaveCycle",
     ),
+
+    # -------------------------------------------------------------
+    # Module: Outpatient Visits (OPD) — Rules & Medicines Tab (TC-OPD-019 to 029)
+    # -------------------------------------------------------------
+    (
+        "TC-OPD-019",
+        "Service quantity field rules (min 1; locked for non-countable vs custom for countable)",
+        "قواعد حقل العدد للخدمة (يجب أن يكون >= 1؛ مغلق للخدمات غير القابلة للعد ومفتوح للخدمات القابلة للعد)",
+        "Verify that quantity defaults to 1 and is locked for non-countable service ('خدمة الظهر الشاملة الكاملة 1'), while countable service ('مفاصل الظهر') allows entering custom quantity.",
+        "التحقق من أن العدد يبدأ بـ 1 ويكون مغلقاً للخدمة غير القابلة للعد، ومفتوحاً لإدخال العدد للخدمة القابلة للعد.",
+        "Functional",
+        "High",
+        "Automated",
+        "verifyServiceQuantityFieldRules",
+    ),
+    (
+        "TC-OPD-020",
+        "Approval number mandatory validation rules",
+        "قواعد إجبارية رقم الموافقة للخدمات التي تتطلب موافقة",
+        "Verify that adding a service requiring approval number without entering approval number displays validation error 'برجاء إدخال رقم الموافقة', while service not requiring approval does not mandate it.",
+        "التحقق من أن إضافة خدمة تطلب موافقة بدون إدخال رقم الموافقة يظهر رسالة تحذير، بينما الخدمة التي لا تطلب موافقة لا تشترط ذلك.",
+        "Negative",
+        "High",
+        "Automated",
+        "verifyApprovalNumberRules",
+    ),
+    (
+        "TC-OPD-021",
+        "Doctor selection mandatory rules by service configuration",
+        "قواعد إجبارية الطبيب حسب إعدادات الخدمة",
+        "Verify adding service not requiring doctor ('كشف ظهر كامل') succeeds without doctor, while service requiring doctor ('كشف ظهر') displays doctor selection validation error.",
+        "التحقق من أن الخدمة التي لا تطلب طبيباً تنزل للقائمة بدون طبيب، بينما الخدمة التي تتطلب طبيباً تظهر رسالة خطأ عند عدم اختياره.",
+        "Functional",
+        "High",
+        "Automated",
+        "verifyDoctorMandatoryRules",
+    ),
+    (
+        "TC-OPD-022",
+        "Service unit price editability rules (fixed vs editable)",
+        "قواعد تعديل سعر وحدة الخدمة (سعر ثابت مغلق مقابل سعر قابل للتعديل)",
+        "Verify price field is locked/readonly for fixed-price service ('خدمة الظهر الشاملة الكاملة 1') and editable for variable-price service.",
+        "التحقق من أن سعر الخدمة الثابتة يكون مغلقاً ومحدداً مسبقاً، وسعر الخدمة القابلة للتعديل يكون مفتوحاً للكتابة.",
+        "Functional",
+        "Medium",
+        "Automated",
+        "verifyServicePriceEditableRules",
+    ),
+    (
+        "TC-OPD-023",
+        "Discount giver mandatory rules when discount percentage is applied",
+        "قواعد مانح الخصم عند إدخال نسبة خصم على الخدمة",
+        "Verify discount giver DDL is disabled by default, opens when discount % is entered, and mandates selecting discount giver before adding service.",
+        "التحقق من أن مانح الخصم يكون مغلقاً افتراضياً ويفتح عند إدخال نسبة خصم، وتشترط الصفحة اختياره قبل إضافة الخدمة.",
+        "Negative",
+        "High",
+        "Automated",
+        "verifyDiscountGiverMandatoryRules",
+    ),
+    (
+        "TC-OPD-024",
+        "Discount percentage upper limit (>100%) and negative value validation",
+        "حدود نسبة الخصم (عدم تجاوز 100% والرفض للقيم السالبة)",
+        "Verify entering discount > 100% displays error 'نسبة الخصم يجب ألا تزيد عن 100%' and clears field, and negative % displays validation error.",
+        "التحقق من إظهار تنبيه عند إدخال نسبة خصم أكبر من 100% وتفريغ الفيلد، وإظهار خطأ عند إدخال قيمة سالبة.",
+        "Negative",
+        "Medium",
+        "Automated",
+        "verifyDiscountPercentageLimits",
+    ),
+    (
+        "TC-OPD-025",
+        "Favorites list toggle, favorite menu selection ('اليكو 2026') and item checkboxes",
+        "إظهار قائمة المفضلة واختيار قائمة 'اليكو 2026' وظهور خيارات الخدمات والأشعة والتحاليل",
+        "Verify clicking 'إظهار المفضلة' opens favorite menu dropdown, selecting favorite menu 'اليكو 2026' displays favorite item checkboxes.",
+        "التحقق من أن زرار 'إظهار المفضلة' يفتح DDL القوائم المفضلة، واختيار قائمة 'اليكو 2026' يظهر عناصر الـ Checkboxes الخاصة بالخدمات والأشعة والتحاليل.",
+        "Positive",
+        "High",
+        "Automated",
+        "favoritesListToggleAndItemSelection",
+    ),
+    (
+        "TC-OPD-026",
+        "Medicines tab initial empty state for Store/Doctor and '+' batch button toggle",
+        "الحالة الأولى لتاب صرف الأدوية (اختر المخزن، اختر الطبيب) وظهور علامة الـ + بعد اختيار المخزن والطبيب",
+        "Verify store and doctor DDLs default to 'اختر المخزن' and 'اختر الطبيب', '+' button is hidden initially and becomes visible after selecting store 'main store' and doctor 'Ahmed Badawi'.",
+        "التحقق من أن DDL المخزن والطبيب يبدءان بدون اختيار، وعلامة الـ + لا تظهر إلا بعد اختيار مخزن 'main store' والطبيب 'Ahmed Badawi'.",
+        "Positive",
+        "High",
+        "Automated",
+        "medicinesTabInitialStateAndStoreDoctorSelection",
+    ),
+    (
+        "TC-OPD-027",
+        "Medicines tab item & unit selection, batch dialog '+', and 'جديد' clear button",
+        "اختيار صنف 'يورانيوم مشع' والوحدة 'حبيبات' وعلامة الـ + وزرار 'جديد' لتفريغ البيانات",
+        "Select item 'يورانيوم مشع', unit 'حبيبات', click '+' batch button, click 'جديد' (clear button) and verify store, doctor, and item selections are cleared.",
+        "اختيار صنف 'يورانيوم مشع' والوحدة 'حبيبات' والضغط على علامة الـ + ثم الضغط على 'جديد' والتأكد من تفريغ داتا المخزن والطبيب والأصناف.",
+        "Positive",
+        "High",
+        "Automated",
+        "medicinesTabItemSelectionBatchAndClearData",
+    ),
+    (
+        "TC-OPD-028",
+        "Medicines tab credit percentage field (نسبة التحمل) locked/readonly for Cash entity",
+        "فيلد نسبة التحمل في تاب صرف الأدوية (مغلق ومحمي للجهات النقدي)",
+        "Verify credit percentage field is locked/readonly for cash entity visits.",
+        "التحقق من أن فيلد نسبة التحمل يكون مغلقاً وغير قابل للتعديل في حالة جهة المريض نقدي.",
+        "Functional",
+        "High",
+        "Automated",
+        "medicinesTabCreditPctReadonlyForCashEntity",
+    ),
+    (
+        "TC-OPD-029",
+        "Medicines tab credit percentage field (نسبة التحمل) enabled/editable (0-100%) for Credit entity",
+        "فيلد نسبة التحمل في تاب صرف الأدوية (مفتوح وقابل لإدخال 0-100% للجهات الآجل)",
+        "Verify credit percentage field is enabled and editable (0-100%) for credit entity visits ('اليكو').",
+        "التحقق من أن فيلد نسبة التحمل يكون مفتوحاً ويقبل نسب من 0 إلى 100% في حالة جهة المريض آجل ('اليكو').",
+        "Functional",
+        "High",
+        "Automated",
+        "medicinesTabCreditPctEditableForCreditEntity",
+    ),
 ]
 
-# Suite override (default = PatientAdmissionTests)
+# Suite / Class mapping
 SUITE_BY_ID = {
+    "TC-AUTH-001": SUITE_LOGIN,
     "TC-ADM-028": SUITE_ACTION_BAR,
     "TC-ADM-029": SUITE_ACTION_BAR,
     "TC-ADM-030": SUITE_ACTION_BAR,
     "TC-ADM-031": SUITE_ACTION_BAR,
     "TC-ADM-032": SUITE_ACTION_BAR,
-    "TC-OPD-001": SUITE_OPD,
-    "TC-OPD-002": SUITE_OPD,
-    "TC-OPD-003": SUITE_OPD,
-    "TC-OPD-004": SUITE_OPD,
-    "TC-OPD-005": SUITE_OPD,
-    "TC-OPD-006": SUITE_OPD,
-    "TC-OPD-007": SUITE_OPD,
-    "TC-OPD-008": SUITE_OPD,
-    "TC-OPD-009": SUITE_OPD,
-    "TC-OPD-010": SUITE_OPD,
-    "TC-OPD-011": SUITE_OPD,
-    "TC-OPD-012": SUITE_OPD,
-    "TC-OPD-013": SUITE_OPD,
-    "TC-OPD-014": SUITE_OPD,
-    "TC-OPD-015": SUITE_OPD,
-    "TC-OPD-016": SUITE_OPD,
-    "TC-OPD-017": SUITE_OPD,
-    "TC-OPD-018": SUITE_OPD,
 }
+for i in range(1, 30):
+    SUITE_BY_ID[f"TC-OPD-{i:03d}"] = SUITE_OPD
 
+# Module mapping
 MODULE_BY_ID = {
-    "TC-OPD-001": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-002": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-003": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-004": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-005": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-006": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-007": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-008": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-009": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-010": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-011": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-012": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-013": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-014": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-015": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-016": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-017": (MODULE_OPD_EN, MODULE_OPD_AR),
-    "TC-OPD-018": (MODULE_OPD_EN, MODULE_OPD_AR),
+    "TC-AUTH-001": (MODULE_AUTH_EN, MODULE_AUTH_AR),
 }
+for i in range(1, 30):
+    MODULE_BY_ID[f"TC-OPD-{i:03d}"] = (MODULE_OPD_EN, MODULE_OPD_AR)
 
+# Date Added mapping
 DATE_BY_ID = {
+    "TC-AUTH-001": "2026-08-08",
+    "TC-ADM-001": "2026-08-16",
+    "TC-ADM-002": "2026-08-16",
+    "TC-ADM-003": "2026-08-16",
+    "TC-ADM-004": "2026-08-16",
+    "TC-ADM-005": "2026-08-16",
+    "TC-ADM-006": "2026-08-16",
+    "TC-ADM-007": "2026-08-16",
+    "TC-ADM-008": "2026-08-16",
+    "TC-ADM-009": "2026-08-16",
+    "TC-ADM-010": "2026-08-16",
+    "TC-ADM-011": "2026-08-16",
+    "TC-ADM-012": "2026-08-16",
+    "TC-ADM-013": "2026-08-16",
+    "TC-ADM-014": "2026-08-16",
+    "TC-ADM-015": "2026-08-16",
+    "TC-ADM-016": "2026-08-16",
+    "TC-ADM-017": "2026-08-16",
+    "TC-ADM-018": "2026-08-16",
+    "TC-ADM-019": "2026-08-16",
+    "TC-ADM-020": "2026-08-16",
+    "TC-ADM-021": "2026-08-16",
     "TC-ADM-022": "2026-07-25",
     "TC-ADM-023": "2026-07-25",
     "TC-ADM-024": "2026-07-25",
@@ -726,10 +889,22 @@ DATE_BY_ID = {
     "TC-OPD-016": "2026-08-16",
     "TC-OPD-017": "2026-08-16",
     "TC-OPD-018": "2026-08-16",
+    "TC-OPD-019": "2026-08-19",
+    "TC-OPD-020": "2026-08-19",
+    "TC-OPD-021": "2026-08-19",
+    "TC-OPD-022": "2026-08-19",
+    "TC-OPD-023": "2026-08-19",
+    "TC-OPD-024": "2026-08-19",
+    "TC-OPD-025": "2026-08-19",
+    "TC-OPD-026": "2026-08-19",
+    "TC-OPD-027": "2026-08-19",
+    "TC-OPD-028": "2026-08-19",
+    "TC-OPD-029": "2026-08-19",
 }
 
-# Notes stamped on rows added in later batches
+# Notes mapping
 NOTES_BY_ID = {
+    "TC-AUTH-001": "Initial suite — Legacy system login & Angular redirect",
     "TC-ADM-022": "Added 2026-07-25 — Unknown Patient modal",
     "TC-ADM-023": "Added 2026-07-25 — Unknown Patient modal",
     "TC-ADM-024": "Added 2026-07-25 — Unknown Patient modal",
@@ -741,11 +916,11 @@ NOTES_BY_ID = {
     "TC-ADM-030": "Added 2026-07-28 — Under-dev action buttons",
     "TC-ADM-031": "Added 2026-07-28 — External visit family (same visit code)",
     "TC-ADM-032": "Added 2026-07-28 — Incompatible visit ERROR",
-    "TC-ADM-033": "Added 2026-08-08 — Refresh patient profile → /reception",
-    "TC-ADM-034": "Added 2026-08-08 — جديد on patient profile → /reception",
+    "TC-ADM-033": "Added 2026-08-08 — Refresh patient profile -> /reception",
+    "TC-ADM-034": "Added 2026-08-08 — جديد on patient profile -> /reception",
     "TC-ADM-035": "Added 2026-08-10 — Reservation Agenda modal current dates",
     "TC-ADM-036": "Added 2026-08-10 — Reservation Agenda search by specific date",
-    "TC-OPD-001": "Added 2026-08-07 — OPD draft → services",
+    "TC-OPD-001": "Added 2026-08-07 — OPD draft -> services",
     "TC-OPD-002": "Added 2026-08-07 — Continue same visit (patient-data-continue-same-visit-btn)",
     "TC-OPD-003": "Added 2026-08-07 — Close unpaid visit blocked (Swal confirm + تنبيه)",
     "TC-OPD-004": "Added 2026-08-07 — Deferred (enabled=false) until clarified",
@@ -763,6 +938,17 @@ NOTES_BY_ID = {
     "TC-OPD-016": "Added 2026-08-16 — Short code lookup (valid 4444 & invalid 91238128 error)",
     "TC-OPD-017": "Added 2026-08-16 — Approval number field state toggle (service 444)",
     "TC-OPD-018": "Added 2026-08-16 — Complete OPD service draft & save cycle",
+    "TC-OPD-019": "Added 2026-08-19 — Rule 1: Service quantity rules (min 1, non-countable vs countable)",
+    "TC-OPD-020": "Added 2026-08-19 — Rule 2: Approval number mandatory validation",
+    "TC-OPD-021": "Added 2026-08-19 — Rule 3: Doctor requirement validation",
+    "TC-OPD-022": "Added 2026-08-19 — Rule 4: Service price editability rules",
+    "TC-OPD-023": "Added 2026-08-19 — Rule 5: Discount giver DDL validation",
+    "TC-OPD-024": "Added 2026-08-19 — Rule 6: Discount percentage limits (>100% and negative)",
+    "TC-OPD-025": "Added 2026-08-19 — Favorites list toggle and 'اليكو 2026' item selection",
+    "TC-OPD-026": "Added 2026-08-19 — Medicines tab initial state & Store/Doctor requirement",
+    "TC-OPD-027": "Added 2026-08-19 — Medicines tab item batch '+' and 'جديد' clear",
+    "TC-OPD-028": "Added 2026-08-19 — Medicines tab credit percentage locked for Cash entity",
+    "TC-OPD-029": "Added 2026-08-19 — Medicines tab credit percentage editable for Credit entity",
 }
 
 
@@ -775,99 +961,121 @@ def style_header(ws):
         cell.border = THIN
     ws.row_dimensions[1].height = 32
     ws.freeze_panes = "A2"
-    ws.auto_filter.ref = "A1:N1"
+    ws.auto_filter.ref = f"A1:{chr(ord('A') + len(HEADERS) - 1)}1"
 
 
-def main():
+def build_workbook():
     wb = Workbook()
 
-    # ---- Instructions sheet ----
-    ws2 = wb.active
-    ws2.title = "How to use"
-    ws2["A1"] = "Paymax Automation — Test Case Register"
-    ws2["A1"].font = Font(bold=True, size=16, color="1F4E79")
-    ws2["A3"] = "Purpose / الغرض"
-    ws2["A3"].font = Font(bold=True, size=12)
-    ws2["A4"] = (
+    # ---- Sheet 1: Instructions ----
+    ws_how = wb.active
+    ws_how.title = "How to use"
+    ws_how["A1"] = "Paymax Automation — Test Case Register"
+    ws_how["A1"].font = Font(bold=True, size=16, color="1F4E79")
+    ws_how["A3"] = "Purpose / الغرض"
+    ws_how["A3"].font = Font(bold=True, size=12)
+    ws_how["A4"] = (
         "This workbook is the master list of all automated (and planned) test cases for Paymax."
     )
-    ws2["A5"] = (
+    ws_how["A5"] = (
         "هذا الملف هو السجل الرئيسي لكل التست كيسز اللي اتعملت أو هتتعمل على نظام Paymax."
     )
-    ws2["A7"] = "How to add a new test case / إضافة تيست كيس جديد"
-    ws2["A7"].font = Font(bold=True, size=12)
+    ws_how["A7"] = "How to add a new test case / إضافة تيست كيس جديد"
+    ws_how["A7"].font = Font(bold=True, size=12)
     steps = [
         '1. Open the "Test Cases" sheet.',
         "2. Add a new row at the bottom.",
-        "3. Fill TC ID using the next number (example: TC-ADM-022). Prefix: ADM = Admission / Medical File.",
+        "3. Fill TC ID using the next number (example: TC-ADM-037 or TC-OPD-030).",
         "4. Fill English + Arabic name and description.",
         "5. Choose Type / Priority / Automation Status from the dropdowns.",
         '6. Put the Java method name in "Method Name" when it is automated.',
         "",
         "1. افتح شيت Test Cases.",
         "2. أضف صف جديد في آخر الجدول.",
-        "3. اكتب TC ID بالرقم التالي (مثال: TC-ADM-022). البادئة ADM = الملف الطبي.",
+        "3. اكتب TC ID بالرقم التالي (مثال: TC-ADM-037 أو TC-OPD-030).",
         "4. املأ الاسم والوصف بالعربي والإنجليزي.",
         "5. اختَر Type / Priority / Automation Status من القوائم.",
         "6. لما التيست يبقى Automated، حط اسم الميثود في Method Name.",
     ]
     for i, text in enumerate(steps):
-        ws2.cell(8 + i, 1, text)
+        ws_how.cell(8 + i, 1, text)
 
     automated = sum(1 for c in CASES if c[7] == "Automated")
     planned = sum(1 for c in CASES if c[7] == "Planned")
 
-    ws2["A23"] = "Current coverage / التغطية الحالية"
-    ws2["A23"].font = Font(bold=True, size=12)
-    ws2["A24"] = "Modules: Admission (ADM) + Outpatient (OPD)"
-    ws2["A25"] = f"Total test cases: {len(CASES)} | Automated: {automated} | Planned: {planned}"
-    ws2["A26"] = f"Classes: {SUITE_ADMISSION} + {SUITE_ACTION_BAR} + {SUITE_OPD}"
-    ws2["A27"] = f"Last updated: {TODAY}"
-    ws2["A29"] = "Added on 2026-07-25 / اللي اتضاف يوم 25-07"
-    ws2["A29"].font = Font(bold=True, size=12)
-    ws2["A30"] = "TC-ADM-022 → Unknown patient: code is read-only"
-    ws2["A31"] = "TC-ADM-023 → Unknown patient: happy path save (Success)"
-    ws2["A32"] = "TC-ADM-024 → Unknown patient: close modal (X)"
-    ws2["A33"] = "TC-ADM-025 → Default الجهة = $$نقدي 2019"
-    ws2["A34"] = "TC-ADM-026 → إثبات الشخصية updates ID field label (e.g. جواز سفر)"
-    ws2["A35"] = "TC-ADM-027 → نوع التعاقد default العضو نفسه; DDL: العضو نفسه|مريض تابع; مريض تابع → درجة القرابة الزوج/الزوجة"
-    ws2["A37"] = "Added on 2026-07-28 / اللي اتضاف يوم 28-07 (Top Action Bar)"
-    ws2["A37"].font = Font(bold=True, size=12)
-    ws2["A38"] = "TC-ADM-028 → Action bar redirects with dynamic patientCode"
-    ws2["A39"] = "TC-ADM-029 → Barcode popup (/print/barcode?id=) + close print window"
-    ws2["A40"] = "TC-ADM-030 → Under-dev buttons: قسطرة / غسيل كلى / المناظير / الأرشيف"
-    ws2["A41"] = "TC-ADM-031 → External visit family (OPD/Rays/Lab) keeps same كود الزيارة"
-    ws2["A42"] = "TC-ADM-032 → Incompatible visit switch shows ERROR (Inpatient/Emergency vs others)"
-    ws2["A44"] = "Added on 2026-08-07 / اللي اتضاف يوم 07-08 (Outpatient cycle)"
-    ws2["A44"].font = Font(bold=True, size=12)
-    ws2["A45"] = "TC-OPD-001 → Draft OPD visit save → /clinic/visits/{code}/services"
-    ws2["A46"] = "TC-OPD-002 → Continue same visit (patient-data-continue-same-visit-btn)"
-    ws2["A47"] = "TC-OPD-003 → Close unpaid visit blocked (confirm نعم → تنبيه لم تُدفع بعد)"
-    ws2["A48"] = "TC-OPD-004 → Add service & total (Planned / enabled=false)"
-    ws2["A50"] = "Added on 2026-08-08 / اللي اتضاف يوم 08-08 (Reception URL reset)"
-    ws2["A50"].font = Font(bold=True, size=12)
-    ws2["A51"] = "TC-ADM-033 → Refresh on /reception/patient/{code} redirects to /reception"
-    ws2["A52"] = "TC-ADM-034 → جديد on selected patient navigates to /reception"
-    ws2["A54"] = "Added on 2026-08-10 / اللي اتضاف يوم 10-08 (Reservation Agenda & OPD Services/Payments)"
-    ws2["A54"].font = Font(bold=True, size=12)
-    ws2["A55"] = "TC-ADM-035 → Reservation Agenda modal opens with current dates (from/to = today)"
-    ws2["A56"] = "TC-ADM-036 → Reservation Agenda search by specific date (2026-08-08) returns matching results"
-    ws2["A57"] = "TC-OPD-005 → OPD services page header title and summary chips (total, paid, insurance %, remaining, services count)"
-    ws2["A58"] = "TC-OPD-006 → OPD services page tabs active state & badge counts"
-    ws2["A59"] = "TC-OPD-007 → Add service form initial state & price field restrictions (readonly)"
-    ws2["A60"] = "TC-OPD-008 → Add service to visit & save visit info"
-    ws2["A61"] = "TC-OPD-009 → Save visit info button success toast notification"
-    ws2["A62"] = "TC-OPD-010 → OPD visit payment flow (receipt created & added to history table)"
-    ws2["A63"] = "TC-OPD-011 → Services page back button navigation"
-    ws2["A65"] = "Seed patients (manual setup):"
-    ws2["A65"].font = Font(bold=True, size=12)
-    ws2["A66"] = "OPD active 30499 | Unpaid OPD 30552 | Inpatient 30496 | Emergency 30495 | Rays 30485 | Lab 30456"
-    ws2["A68"] = "Suggested ID prefixes:"
-    ws2["A68"].font = Font(bold=True, size=12)
-    ws2["A69"] = "ADM = Patient Admission | OPD = Outpatient | BILL = Billing | LAB = Lab | PHARM = Pharmacy | AUTH = Login/Auth"
-    ws2.column_dimensions["A"].width = 110
+    ws_how["A23"] = "Current coverage / التغطية الحالية"
+    ws_how["A23"].font = Font(bold=True, size=12)
+    ws_how["A24"] = "Modules: Authentication (AUTH) + Admission (ADM) + Outpatient (OPD)"
+    ws_how["A25"] = f"Total test cases: {len(CASES)} | Automated: {automated} | Planned: {planned}"
+    ws_how["A26"] = f"Classes: {SUITE_LOGIN} + {SUITE_ADMISSION} + {SUITE_ACTION_BAR} + {SUITE_OPD}"
+    ws_how["A27"] = f"Last updated: {TODAY}"
 
-    # ---- Test Cases sheet ----
+    change_log = [
+        ("A29", "Added on 2026-07-25 / اللي اتضاف يوم 25-07 (Unknown Patient & Dynamic UI)"),
+        ("A30", "TC-ADM-022 → Unknown patient: code is read-only"),
+        ("A31", "TC-ADM-023 → Unknown patient: happy path save (Success)"),
+        ("A32", "TC-ADM-024 → Unknown patient: close modal (X)"),
+        ("A33", "TC-ADM-025 → Default الجهة = $$نقدي 2019"),
+        ("A34", "TC-ADM-026 → إثبات الشخصية updates ID field label (e.g. جواز سفر)"),
+        ("A35", "TC-ADM-027 → نوع التعاقد default العضو نفسه; DDL: العضو نفسه|مريض تابع; مريض تابع → درجة القرابة الزوج/الزوجة"),
+        ("A37", "Added on 2026-07-28 / اللي اتضاف يوم 28-07 (Top Action Bar)"),
+        ("A38", "TC-ADM-028 → Action bar redirects with dynamic patientCode"),
+        ("A39", "TC-ADM-029 → Barcode popup (/print/barcode?id=) + close print window"),
+        ("A40", "TC-ADM-030 → Under-dev buttons: قسطرة / غسيل كلى / المناظير / الأرشيف"),
+        ("A41", "TC-ADM-031 → External visit family (OPD/Rays/Lab) keeps same كود الزيارة"),
+        ("A42", "TC-ADM-032 → Incompatible visit switch shows ERROR (Inpatient/Emergency vs others)"),
+        ("A44", "Added on 2026-08-07 / اللي اتضاف يوم 07-08 (Outpatient cycle)"),
+        ("A45", "TC-OPD-001 → Draft OPD visit save → /clinic/visits/{code}/services"),
+        ("A46", "TC-OPD-002 → Continue same visit (patient-data-continue-same-visit-btn)"),
+        ("A47", "TC-OPD-003 → Close unpaid visit blocked (confirm نعم → تنبيه لم تُدفع بعد)"),
+        ("A48", "TC-OPD-004 → Add service & total (Planned / enabled=false)"),
+        ("A50", "Added on 2026-08-08 / اللي اتضاف يوم 08-08 (Auth Bridge & Reception URL reset)"),
+        ("A51", "TC-AUTH-001 → Legacy login bridge lands on new Paymax home (port 4040)"),
+        ("A52", "TC-ADM-033 → Refresh on /reception/patient/{code} redirects to /reception"),
+        ("A53", "TC-ADM-034 → جديد on selected patient navigates to /reception"),
+        ("A55", "Added on 2026-08-10 / اللي اتضاف يوم 10-08 (Reservation Agenda & OPD Services/Payments)"),
+        ("A56", "TC-ADM-035 → Reservation Agenda modal opens with current dates (from/to = today)"),
+        ("A57", "TC-ADM-036 → Reservation Agenda search by specific date (2026-08-08) returns matching results"),
+        ("A58", "TC-OPD-005 → OPD services page header title and summary chips (total, paid, insurance %, remaining, count)"),
+        ("A59", "TC-OPD-006 → OPD services page tabs active state & badge counts"),
+        ("A60", "TC-OPD-007 → Add service form initial state & price field restrictions (readonly)"),
+        ("A61", "TC-OPD-008 → Add service to visit & save visit info"),
+        ("A62", "TC-OPD-009 → Save visit info button success toast notification"),
+        ("A63", "TC-OPD-010 → OPD visit payment flow (receipt created & added to history table)"),
+        ("A64", "TC-OPD-011 → Services page back button navigation"),
+        ("A66", "Added on 2026-08-16 / اللي اتضاف يوم 16-08 (OPD Advanced Service Validations & Claim)"),
+        ("A67", "TC-OPD-012 → Service group clinic filter ('الرمد والليزك' -> 'عيادة 8')"),
+        ("A68", "TC-OPD-013 → ICD10 mandatory check by entity (النقدي2019 optional, اليكو mandatory)"),
+        ("A69", "TC-OPD-014 → Print barcode button URL"),
+        ("A70", "TC-OPD-015 → Claim modal CRUD operations (add, download, delete)"),
+        ("A71", "TC-OPD-016 → Short code lookup (valid 4444 & invalid 91238128 error)"),
+        ("A72", "TC-OPD-017 → Approval number field state toggle (service 444)"),
+        ("A73", "TC-OPD-018 → Complete OPD service draft & save cycle"),
+        ("A75", "Added on 2026-08-19 / اللي اتضاف يوم 19-08 (OPD Rules & Medicines Tab)"),
+        ("A76", "TC-OPD-019 → Service quantity field rules (min 1, non-countable lock 1, countable custom)"),
+        ("A77", "TC-OPD-020 → Approval number mandatory validation rules"),
+        ("A78", "TC-OPD-021 → Doctor selection mandatory rules by service configuration"),
+        ("A79", "TC-OPD-022 → Service unit price editability rules (fixed vs editable)"),
+        ("A80", "TC-OPD-023 → Discount giver mandatory rules when discount percentage applied"),
+        ("A81", "TC-OPD-024 → Discount percentage limits (>100% and negative value)"),
+        ("A82", "TC-OPD-025 → Favorites list toggle and item selection ('اليكو 2026')"),
+        ("A83", "TC-OPD-026 → Medicines tab initial state & Store/Doctor requirement"),
+        ("A84", "TC-OPD-027 → Medicines tab item & unit selection, batch '+', and 'جديد' clear"),
+        ("A85", "TC-OPD-028 → Medicines tab credit percentage locked for Cash entity"),
+        ("A86", "TC-OPD-029 → Medicines tab credit percentage editable for Credit entity"),
+        ("A88", "Seed patients (manual setup):"),
+        ("A89", "OPD active 30499 | Unpaid OPD 30552 | Inpatient 30496 | Emergency 30495 | Rays 30485 | Lab 30456"),
+        ("A91", "Suggested ID prefixes:"),
+        ("A92", "ADM = Patient Admission | OPD = Outpatient | BILL = Billing | LAB = Lab | PHARM = Pharmacy | AUTH = Login/Auth"),
+    ]
+    for cell_ref, text in change_log:
+        ws_how[cell_ref] = text
+        if text.startswith("Added on") or text.startswith("Seed patients") or text.startswith("Suggested ID"):
+            ws_how[cell_ref].font = Font(bold=True, size=12)
+
+    ws_how.column_dimensions["A"].width = 120
+
+    # ---- Sheet 2: Test Cases ----
     ws = wb.create_sheet("Test Cases")
     style_header(ws)
 
@@ -909,17 +1117,17 @@ def main():
         "H": 12,
         "I": 10,
         "J": 16,
-        "K": 42,
+        "K": 44,
         "L": 24,
         "M": 12,
-        "N": 30,
+        "N": 32,
     }
     for col, width in widths.items():
         ws.column_dimensions[col].width = width
 
     dv_type = DataValidation(
         type="list",
-        formula1='"Positive,Negative,Boundary,Smoke,Regression"',
+        formula1='"Positive,Negative,Boundary,Smoke,Regression,Functional"',
         allow_blank=True,
     )
     dv_prio = DataValidation(
@@ -938,8 +1146,8 @@ def main():
         dv.add(rng)
         ws.add_data_validation(dv)
 
-    # ---- Summary sheet ----
-    ws3 = wb.create_sheet("Summary")
+    # ---- Sheet 3: Summary ----
+    ws_sum = wb.create_sheet("Summary")
     summary_headers = [
         "Module (EN)",
         "Module (AR)",
@@ -949,38 +1157,54 @@ def main():
         "Planned",
     ]
     for col, header in enumerate(summary_headers, 1):
-        cell = ws3.cell(1, col, header)
+        cell = ws_sum.cell(1, col, header)
         cell.fill = HEADER_FILL
         cell.font = HEADER_FONT
         cell.border = THIN
         cell.alignment = CENTER
 
-    adm_cases = [c for c in CASES if not c[0].startswith("TC-OPD-")]
+    auth_cases = [c for c in CASES if c[0].startswith("TC-AUTH-")]
+    adm_cases = [c for c in CASES if c[0].startswith("TC-ADM-")]
     opd_cases = [c for c in CASES if c[0].startswith("TC-OPD-")]
 
     def write_summary_row(row_idx, module_en, module_ar, cases):
-        ws3.cell(row_idx, 1, module_en)
-        ws3.cell(row_idx, 2, module_ar)
-        ws3.cell(row_idx, 3, len(cases))
-        ws3.cell(row_idx, 4, sum(1 for c in cases if c[7] == "Automated"))
-        ws3.cell(row_idx, 5, sum(1 for c in cases if c[7] == "In Progress"))
-        ws3.cell(row_idx, 6, sum(1 for c in cases if c[7] == "Planned"))
+        ws_sum.cell(row_idx, 1, module_en)
+        ws_sum.cell(row_idx, 2, module_ar)
+        ws_sum.cell(row_idx, 3, len(cases))
+        ws_sum.cell(row_idx, 4, sum(1 for c in cases if c[7] == "Automated"))
+        ws_sum.cell(row_idx, 5, sum(1 for c in cases if c[7] == "In Progress"))
+        ws_sum.cell(row_idx, 6, sum(1 for c in cases if c[7] == "Planned"))
         for col in range(1, 7):
-            ws3.cell(row_idx, col).border = THIN
-            ws3.cell(row_idx, col).alignment = CENTER if col >= 3 else WRAP
+            ws_sum.cell(row_idx, col).border = THIN
+            ws_sum.cell(row_idx, col).alignment = CENTER if col >= 3 else WRAP
 
-    write_summary_row(2, "Patient Admission / Medical File", "الملف الطبي / استقبال المريض", adm_cases)
-    write_summary_row(3, "Outpatient Visits (OPD)", "العيادات الخارجية", opd_cases)
+    write_summary_row(2, MODULE_AUTH_EN, MODULE_AUTH_AR, auth_cases)
+    write_summary_row(3, MODULE_ADM_EN, MODULE_ADM_AR, adm_cases)
+    write_summary_row(4, MODULE_OPD_EN, MODULE_OPD_AR, opd_cases)
 
-    for col, width in zip("ABCDEF", [36, 32, 12, 12, 12, 12]):
-        ws3.column_dimensions[col].width = width
+    # Total row
+    ws_sum.cell(5, 1, "Total")
+    ws_sum.cell(5, 2, "الإجمالي")
+    ws_sum.cell(5, 3, len(CASES))
+    ws_sum.cell(5, 4, sum(1 for c in CASES if c[7] == "Automated"))
+    ws_sum.cell(5, 5, sum(1 for c in CASES if c[7] == "In Progress"))
+    ws_sum.cell(5, 6, sum(1 for c in CASES if c[7] == "Planned"))
+    for col in range(1, 7):
+        ws_sum.cell(5, col).border = THIN
+        ws_sum.cell(5, col).font = Font(bold=True)
+        ws_sum.cell(5, col).alignment = CENTER if col >= 3 else WRAP
 
-    out_dated = r"d:\Ma3n\Automation Test For new Paymax\Paymax_Test_Cases 10-8-2026.xlsx"
-    wb.save(OUT)
-    wb.save(out_dated)
-    print(f"Saved: {OUT}")
-    print(f"Saved: {out_dated}")
-    print(f"Total cases: {len(CASES)}")
+    for col, width in zip("ABCDEF", [42, 38, 12, 12, 12, 12]):
+        ws_sum.column_dimensions[col].width = width
+
+    return wb
+
+
+def main():
+    wb = build_workbook()
+    wb.save(OUT_EXCEL)
+    print(f"Successfully generated: {OUT_EXCEL}")
+    print(f"Total test cases: {len(CASES)}")
 
 
 if __name__ == "__main__":
