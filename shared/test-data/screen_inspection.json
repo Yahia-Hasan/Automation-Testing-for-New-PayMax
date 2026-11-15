@@ -1,0 +1,105 @@
+{
+  "Rooms": {
+    "url": "https://196.218.246.250:4040/reception/rooms",
+    "title": "إشغال الغرف (خريطة)",
+    "data_test_ids": [
+      "global-toast-stack",
+      "accomodation-rooms-back-btn"
+    ],
+    "buttons": [
+      "رجوع"
+    ],
+    "inputs_sample": []
+  },
+  "Inpatients": {
+    "url": "https://196.218.246.250:4040/reception/inpatients",
+    "title": "المقيمين بالغرف",
+    "data_test_ids": [
+      "global-toast-stack",
+      "inpatient-list-refresh-btn",
+      "inpatient-list-search-input"
+    ],
+    "buttons": [
+      "تحديث"
+    ],
+    "inputs_sample": [
+      "بحث باسم المريض / كود / طبيب / غرفة..."
+    ]
+  },
+  "Emergency": {
+    "url": "https://196.218.246.250:4040/emergency/waiting-list",
+    "title": "المرضى بالطوارئ",
+    "data_test_ids": [
+      "global-toast-stack",
+      "emergency-waiting-list-search-input",
+      "emergency-waiting-list-export-excel-btn",
+      "emergency-waiting-list-row",
+      "emergency-waiting-list-prev-page-btn",
+      "emergency-waiting-list-page-btn",
+      "emergency-waiting-list-next-page-btn",
+      "emergency-waiting-list-page-size-select"
+    ],
+    "buttons": [
+      "تصدير إلى إكسيل",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "inputs_sample": [
+      "بحث…"
+    ]
+  },
+  "Invoices": {
+    "url": "https://196.218.246.250:4040/patient-accounts/registered-invoices",
+    "title": "فواتير المرضى",
+    "data_test_ids": [
+      "global-toast-stack",
+      "registered-invoices-from-date-input",
+      "registered-invoices-to-date-input",
+      "registered-invoices-client-select",
+      "registered-invoices-ins-company-select",
+      "registered-invoices-acc-types-select",
+      "registered-invoices-hospital-section-select",
+      "registered-invoices-search-btn",
+      "registered-invoices-today-exit-btn",
+      "registered-invoices-search-input",
+      "registered-invoices-export-excel-btn"
+    ],
+    "buttons": [
+      "بحث",
+      "خروج اليوم",
+      "تصدير إلى إكسيل"
+    ],
+    "inputs_sample": [
+      "date",
+      "date",
+      "text",
+      "text",
+      "text",
+      "بحث..."
+    ]
+  },
+  "Doctors": {
+    "url": "https://196.218.246.250:4040/info-desk/doctors",
+    "title": "بيانات الأطباء",
+    "data_test_ids": [
+      "global-toast-stack",
+      "doctors-list-export-excel-btn",
+      "doctors-list-search-input",
+      "doctors-list-active-only-checkbox"
+    ],
+    "buttons": [
+      "تصدير إلى إكسيل"
+    ],
+    "inputs_sample": [
+      "ابحث باسم الطبيب أو التخصص...",
+      "checkbox"
+    ]
+  }
+}

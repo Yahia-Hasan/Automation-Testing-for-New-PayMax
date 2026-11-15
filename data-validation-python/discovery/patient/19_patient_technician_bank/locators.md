@@ -1,0 +1,25 @@
+# محددات عناصر صفحة: بنك الفنيين (Locators)
+
+- **المسار (Route):** `/patient-accounts/technician-bank`
+- **المكون (Angular Component):** `<app-technician-bank>`
+- **إجمالي عناصر test-id المكتشفة:** `15`
+
+---
+
+| # | اسم العنصر | الأولوية الأولى (`test-id`) | أفضل بديل (CSS Selector) | محدد XPath الاحتياطي | نوع الحقل |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | **global-toast-stack** | `[test-id="global-toast-stack"]` | `div[data-test-id='global-toast-stack'], div[test-id='global-toast-stack']` | `//div[@test-id='global-toast-stack' or @data-test-id='global-toast-stack']` | `div ()` |
+| 2 | **technician-bank-from-date-input** | `[test-id="technician-bank-from-date-input"]` | `input[data-test-id='technician-bank-from-date-input'], input[test-id='technician-bank-from-date-input']` | `//input[@test-id='technician-bank-from-date-input' or @data-test-id='technician-bank-from-date-input']` | `input (date)` |
+| 3 | **technician-bank-to-date-input** | `[test-id="technician-bank-to-date-input"]` | `input[data-test-id='technician-bank-to-date-input'], input[test-id='technician-bank-to-date-input']` | `//input[@test-id='technician-bank-to-date-input' or @data-test-id='technician-bank-to-date-input']` | `input (date)` |
+| 4 | **-- الكل --أحمد خالد أحمد صلاح الدينأحمد ** | `[test-id="technician-bank-technician-select"]` | `select[data-test-id='technician-bank-technician-select'], select[test-id='technician-bank-technician-select']` | `//select[@test-id='technician-bank-technician-select' or @data-test-id='technician-bank-technician-select']` | `select ()` |
+| 5 | **-- الكل --** | `[test-id="technician-bank-service-select"]` | `ng-select[data-test-id='technician-bank-service-select'], ng-select[test-id='technician-bank-service-select']` | `//ng-select[@test-id='technician-bank-service-select' or @data-test-id='technician-bank-service-select']` | `ng-select ()` |
+| 6 | **ابحث بالاسم / الكود / الموبايل...** | `[test-id="technician-bank-patient-select"]` | `ng-select[data-test-id='technician-bank-patient-select'], ng-select[test-id='technician-bank-patient-select']` | `//ng-select[@test-id='technician-bank-patient-select' or @data-test-id='technician-bank-patient-select']` | `ng-select ()` |
+| 7 | **الكلمسددغير مسدد** | `[test-id="technician-bank-payment-status-select"]` | `select[data-test-id='technician-bank-payment-status-select'], select[test-id='technician-bank-payment-status-select']` | `//select[@test-id='technician-bank-payment-status-select' or @data-test-id='technician-bank-payment-status-select']` | `select ()` |
+| 8 | **الكلكاشآجل** | `[test-id="technician-bank-contract-type-select"]` | `select[data-test-id='technician-bank-contract-type-select'], select[test-id='technician-bank-contract-type-select']` | `//select[@test-id='technician-bank-contract-type-select' or @data-test-id='technician-bank-contract-type-select']` | `select ()` |
+| 9 | **-- الكل --** | `[test-id="technician-bank-client-select"]` | `ng-select[data-test-id='technician-bank-client-select'], ng-select[test-id='technician-bank-client-select']` | `//ng-select[@test-id='technician-bank-client-select' or @data-test-id='technician-bank-client-select']` | `ng-select ()` |
+| 10 | **بحث** | `[test-id="technician-bank-search-btn"]` | `button[data-test-id='technician-bank-search-btn'], button[test-id='technician-bank-search-btn']` | `//button[@test-id='technician-bank-search-btn' or @data-test-id='technician-bank-search-btn']` | `button ()` |
+| 11 | **اختر الخزينة** | `[test-id="technician-bank-treasury-select"]` | `ng-select[data-test-id='technician-bank-treasury-select'], ng-select[test-id='technician-bank-treasury-select']` | `//ng-select[@test-id='technician-bank-treasury-select' or @data-test-id='technician-bank-treasury-select']` | `ng-select ()` |
+| 12 | **حفظ التسوية** | `[test-id="technician-bank-save-settlement-btn"]` | `button[data-test-id='technician-bank-save-settlement-btn'], button[test-id='technician-bank-save-settlement-btn']` | `//button[@test-id='technician-bank-save-settlement-btn' or @data-test-id='technician-bank-save-settlement-btn']` | `button ()` |
+| 13 | **بحث...** | `[test-id="technician-bank-search-input"]` | `input[data-test-id='technician-bank-search-input'], input[test-id='technician-bank-search-input']` | `//input[@test-id='technician-bank-search-input' or @data-test-id='technician-bank-search-input']` | `input (text)` |
+| 14 | **تصدير إلى إكسيل** | `[test-id="technician-bank-export-excel-btn"]` | `button[data-test-id='technician-bank-export-excel-btn'], button[test-id='technician-bank-export-excel-btn']` | `//button[@test-id='technician-bank-export-excel-btn' or @data-test-id='technician-bank-export-excel-btn']` | `button ()` |
+| 15 | **technician-bank-select-all-checkbox** | `[test-id="technician-bank-select-all-checkbox"]` | `input[data-test-id='technician-bank-select-all-checkbox'], input[test-id='technician-bank-select-all-checkbox']` | `//input[@test-id='technician-bank-select-all-checkbox' or @data-test-id='technician-bank-select-all-checkbox']` | `input (checkbox)` |

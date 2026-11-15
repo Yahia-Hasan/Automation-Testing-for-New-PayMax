@@ -1,0 +1,476 @@
+{
+  "Auth": [
+    {
+      "method": "GET",
+      "endpoint": "/api/auth/me",
+      "status": 200,
+      "body_size": 188,
+      "has_data": true,
+      "data_count": "object"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/auth/session-debug",
+      "status": 200,
+      "body_size": 121,
+      "has_data": true,
+      "data_count": "object"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/auth/computers",
+      "status": 200,
+      "body_size": 8506,
+      "has_data": true,
+      "data_count": "145"
+    }
+  ],
+  "Reception": [
+    {
+      "method": "GET",
+      "endpoint": "/api/reception/patients/search?query=a",
+      "status": 200,
+      "body_size": 2901,
+      "has_data": true,
+      "data_count": "20"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/reception/patients/30855",
+      "status": 200,
+      "body_size": 1018,
+      "has_data": true,
+      "data_count": "object"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/reception/nationalities",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/reception/companies",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/reception/branches",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Clinic (OPD)": [
+    {
+      "method": "GET",
+      "endpoint": "/api/clinic/visits?date=2026-10-17",
+      "status": 200,
+      "body_size": 561,
+      "has_data": true,
+      "data_count": "1"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/clinic/specialties",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/clinic/doctors",
+      "status": 200,
+      "body_size": 69119,
+      "has_data": true,
+      "data_count": "691"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/clinic/waiting-list",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Emergency": [
+    {
+      "method": "GET",
+      "endpoint": "/api/emergency/waiting-list",
+      "status": 200,
+      "body_size": 90078,
+      "has_data": true,
+      "data_count": "512"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/emergency/cases",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Inpatient / Admission": [
+    {
+      "method": "GET",
+      "endpoint": "/api/inpatient/departments",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/inpatient/rooms",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/inpatient/beds",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/inpatient/waiting-list",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/inpatient/admissions",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Patient Accounts / Invoices": [
+    {
+      "method": "GET",
+      "endpoint": "/api/patient-accounts/invoices",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/patient-accounts/invoice-details?rid=12746",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/invoice-details/12746",
+      "status": 200,
+      "body_size": 1629,
+      "has_data": true,
+      "data_count": "object"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/patient-accounts/services",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/patient-accounts/payments",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Accountant": [
+    {
+      "method": "GET",
+      "endpoint": "/api/accountant/reservations/open",
+      "status": 200,
+      "body_size": 324275,
+      "has_data": true,
+      "data_count": "784"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/accountant/leaving-requests",
+      "status": 200,
+      "body_size": 2,
+      "has_data": false,
+      "data_count": "0"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/accountant/leaving-approval",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Nursing": [
+    {
+      "method": "GET",
+      "endpoint": "/api/nursing/waiting-list",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/nursing/accommodation-rooms",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/nursing/icu",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/nursing/medical-reports",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Lab": [
+    {
+      "method": "GET",
+      "endpoint": "/api/lab/requests",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/lab/results",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/lab/pending",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Radiology (Rays)": [
+    {
+      "method": "GET",
+      "endpoint": "/api/rays/requests",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/rays/results",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/rays/pending",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Pharmacy / Medications": [
+    {
+      "method": "GET",
+      "endpoint": "/api/pharmacy/medications",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/pharmacy/dispensing",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/medications/list",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Surgery / Operations": [
+    {
+      "method": "GET",
+      "endpoint": "/api/surgery/bookings",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/surgery/schedule",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/operations/bookings",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Physical Therapy": [
+    {
+      "method": "GET",
+      "endpoint": "/api/physical-therapy/waiting-list",
+      "status": 500,
+      "body_size": 231,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/physical-therapy/sessions",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Dashboards / Audit": [
+    {
+      "method": "GET",
+      "endpoint": "/api/dashboards/audit",
+      "status": 200,
+      "body_size": 1348,
+      "has_data": true,
+      "data_count": "object"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/dashboards/statistics",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/dashboards/occupancy",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Price Lists / Services": [
+    {
+      "method": "GET",
+      "endpoint": "/api/pricelists",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/services/categories",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/services/list",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Blood Bank": [
+    {
+      "method": "GET",
+      "endpoint": "/api/blood-bank/requests",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/blood-bank/inventory",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ],
+  "Treasuries / Cashier": [
+    {
+      "method": "GET",
+      "endpoint": "/api/treasuries",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/treasuries/transactions",
+      "status": 404,
+      "body_size": 0,
+      "has_data": false,
+      "data_count": "N/A"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "test_patient_defaults": {
+    "arabic_full_name_valid": "يحيى تيست اوتوميشن رباعي",
+    "arabic_short_name_warning": "يحيى تيست",
+    "arabic_single_name_error": "يحيى",
+    "english_full_name": "Yehia Automation Test Four",
+    "mobile_phone": "01099887766",
+    "home_phone": "0223456789",
+    "whatsapp": "01099887766",
+    "gender": "ذكر",
+    "marital_status": "أعزب",
+    "religion": "مسلم",
+    "nationality": "مصري",
+    "id_type": "رقم قومي",
+    "national_id": "29501011234567",
+    "birth_date": "1995-01-01",
+    "age_years": "31",
+    "address": "الدقي - الجيزة",
+    "city": "الجيزة",
+    "zone": "الدقي",
+    "credit_company": "#@ اليكو"
+  },
+  "known_test_entities": {
+    "default_branch_id": "1",
+    "default_branch_name": "Ad Doqi",
+    "department_id": "5",
+    "treasury_id": "0",
+    "sample_patient_codes": [
+      "9001",
+      "9002"
+    ],
+    "sample_visit_codes": [],
+    "sample_reservation_ids": []
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "total": 16,
+  "paths": [
+    "/Inv",
+    "/Patient-Modern-BE/api",
+    "/api",
+    "/auth/accessible-forms",
+    "/auth/authorize",
+    "/auth/auto-login",
+    "/emergency/services/{id}/test-sticker-print",
+    "/legacy",
+    "/lookups",
+    "/services",
+    "/services-by-groups",
+    "/stats",
+    "/th",
+    "/treasury-lookups",
+    "/waitinglist/ipd-services/print/{id}",
+    "/waitinglist/ipd-tests/sticker-print/{id}"
+  ],
+  "by_module": {
+    "Inv": [
+      "/Inv"
+    ],
+    "Patient-Modern-BE": [
+      "/Patient-Modern-BE/api"
+    ],
+    "api": [
+      "/api"
+    ],
+    "auth": [
+      "/auth/accessible-forms",
+      "/auth/authorize",
+      "/auth/auto-login"
+    ],
+    "emergency": [
+      "/emergency/services/{id}/test-sticker-print"
+    ],
+    "legacy": [
+      "/legacy"
+    ],
+    "lookups": [
+      "/lookups"
+    ],
+    "services": [
+      "/services"
+    ],
+    "services-by-groups": [
+      "/services-by-groups"
+    ],
+    "stats": [
+      "/stats"
+    ],
+    "th": [
+      "/th"
+    ],
+    "treasury-lookups": [
+      "/treasury-lookups"
+    ],
+    "waitinglist": [
+      "/waitinglist/ipd-services/print/{id}",
+      "/waitinglist/ipd-tests/sticker-print/{id}"
+    ]
+  }
+}

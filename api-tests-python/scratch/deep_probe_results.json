@@ -1,0 +1,210 @@
+{
+  "live": [
+    {
+      "path": "/api/auth/me",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/auth/auto-login",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/auth/session-debug",
+      "status": 200,
+      "desc": "Object(['origin', 'cookieNames', 'legacyHeaders', 'resolved'])"
+    },
+    {
+      "path": "/api/auth/computers",
+      "status": 200,
+      "desc": "Array[145]"
+    },
+    {
+      "path": "/api/auth/accessible-forms",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/reception/patients/search?query=a",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/reception/patients/30855",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/reception/patients/30855/visits",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/reception/patients/30855/documents",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/clinic/visits?date=2026-10-17",
+      "status": 200,
+      "desc": "Array[2]"
+    },
+    {
+      "path": "/api/clinic/doctors",
+      "status": 200,
+      "desc": "Array[691]"
+    },
+    {
+      "path": "/api/emergency/waiting-list",
+      "status": 200,
+      "desc": "Array[512]"
+    },
+    {
+      "path": "/api/invoice-details/12746",
+      "status": 200,
+      "desc": "Object(['header', 'warnings', 'surgeries', 'accommodations'])"
+    },
+    {
+      "path": "/api/accountant/reservations/open",
+      "status": 200,
+      "desc": "Array[784]"
+    },
+    {
+      "path": "/api/accountant/leaving-requests",
+      "status": 200,
+      "desc": "Array[0]"
+    },
+    {
+      "path": "/api/accountant/invoices",
+      "status": 200,
+      "desc": "Array[0]"
+    },
+    {
+      "path": "/api/dashboards/audit",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    },
+    {
+      "path": "/api/waitinglist/leaving-requests",
+      "status": 200,
+      "desc": "Object(['success', 'message', 'data', 'errors'])"
+    }
+  ],
+  "erroring": [
+    {
+      "path": "/api/auth/authorize",
+      "status": 400,
+      "msg": "One or more validation errors occurred."
+    },
+    {
+      "path": "/api/physical-therapy/waiting-list",
+      "status": 500,
+      "msg": "{\"message\":\"\\u062D\\u062F\\u062B \\u062E\\u0637\\u0623 \\u063A\\u064A\\u0631 \\u0645\\u062A\\u0648\\u0642\\u0639\\"
+    }
+  ],
+  "not_found": [
+    "/api/auth/permissions",
+    "/api/auth/roles",
+    "/api/auth/users",
+    "/api/reception/patients/30855/history",
+    "/api/reception/nationalities",
+    "/api/reception/companies",
+    "/api/reception/branches",
+    "/api/reception/doctors",
+    "/api/reception/specialties",
+    "/api/reception/lookups",
+    "/api/reception/surgery-booking",
+    "/api/reception/surgery-bookings",
+    "/api/clinic/specialties",
+    "/api/clinic/waiting-list",
+    "/api/clinic/visits/draft",
+    "/api/clinic/lookups",
+    "/api/clinic/services",
+    "/api/emergency/cases",
+    "/api/emergency/lookups",
+    "/api/emergency/services",
+    "/api/emergency/doctors",
+    "/api/invoice-details/lookups",
+    "/api/accountant/leaving-approval",
+    "/api/accountant/registered-invoices",
+    "/api/accountant/unregistered-invoices",
+    "/api/accountant/payments",
+    "/api/accountant/lookups",
+    "/api/dashboards/stats",
+    "/api/dashboards/statistics",
+    "/api/dashboards/occupancy",
+    "/api/waitinglist",
+    "/api/waitinglist/accommodation-rooms",
+    "/api/waitinglist/icu",
+    "/api/waitinglist/neonatal",
+    "/api/waitinglist/patient-diets-list",
+    "/api/waitinglist/attendant-diets",
+    "/api/waitinglist/medical-reports",
+    "/api/waitinglist/leaving-approval",
+    "/api/waitinglist/ipd-services",
+    "/api/waitinglist/ipd-tests",
+    "/api/waitinglist/lookups",
+    "/api/lookups",
+    "/api/lookups/nationalities",
+    "/api/lookups/companies",
+    "/api/lookups/specialties",
+    "/api/lookups/doctors",
+    "/api/lookups/departments",
+    "/api/lookups/rooms",
+    "/api/lookups/beds",
+    "/api/lookups/services",
+    "/api/lookups/service-groups",
+    "/api/lookups/treasuries",
+    "/api/treasury-lookups",
+    "/api/services",
+    "/api/services-by-groups",
+    "/api/stats",
+    "/api/stats/dashboard",
+    "/api/stats/occupancy",
+    "/api/inpatient",
+    "/api/inpatient/admissions",
+    "/api/inpatient/clinical-care",
+    "/api/inpatient/services",
+    "/api/inpatient/medications",
+    "/api/inpatient/labs",
+    "/api/inpatient/rays",
+    "/api/inpatient/lookups",
+    "/api/patient-services",
+    "/api/patient-services/services",
+    "/api/patient-services/labs",
+    "/api/patient-services/rays",
+    "/api/patient-services/medications",
+    "/api/patient-accounts",
+    "/api/patient-accounts/invoices",
+    "/api/patient-accounts/payments",
+    "/api/patient-accounts/services",
+    "/api/patient-accounts/lookups",
+    "/api/physical-therapy/sessions",
+    "/api/physical-therapy/lookups",
+    "/api/surgery",
+    "/api/surgery/bookings",
+    "/api/surgery/names",
+    "/api/surgery/prices",
+    "/api/surgery/schedule",
+    "/api/surgery/lookups",
+    "/api/lab",
+    "/api/lab/requests",
+    "/api/lab/results",
+    "/api/lab/pending",
+    "/api/lab/lookups",
+    "/api/rays",
+    "/api/rays/requests",
+    "/api/rays/results",
+    "/api/rays/pending",
+    "/api/rays/lookups",
+    "/api/nursing",
+    "/api/nursing/waiting-list",
+    "/api/nursing/accommodation",
+    "/api/nursing/icu",
+    "/api/nursing/lookups",
+    "/api/pricelists",
+    "/api/pricelists/services",
+    "/api/pricelists/groups"
+  ]
+}

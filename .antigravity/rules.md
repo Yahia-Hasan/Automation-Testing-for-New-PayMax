@@ -1,0 +1,3 @@
+# Workspace Rules
+
+Before writing or modifying any test, always read PROJECT_CONTEXT.md and reuse existing utilities in shared/python-utils/ or ui-tests-java/. Never duplicate login, driver setup, or config reading logic.

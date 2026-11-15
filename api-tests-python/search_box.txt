@@ -1,0 +1,5 @@
+<div _ngcontent-ng-c1885566993="" class="search-box">
+ <i _ngcontent-ng-c1885566993="" class="pi pi-search">
+ </i>
+ <input _ngcontent-ng-c1885566993="" class="ng-untouched ng-pristine ng-valid" data-test-id="patient-data-search-input" placeholder="بحث عن مريض" type="text"/>
+</div>

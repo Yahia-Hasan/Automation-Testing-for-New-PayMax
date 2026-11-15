@@ -1,0 +1,60 @@
+{
+  "by_page": {
+    "Reception": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ],
+    "Patient Details": [
+      "GET /api/auth/auto-login"
+    ],
+    "Clinic Waiting": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ],
+    "OPD Draft Visit": [
+      "GET /api/auth/auto-login"
+    ],
+    "Emergency Waiting": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ],
+    "Nursing - Accommodation": [
+      "GET /api/auth/auto-login"
+    ],
+    "Nursing - ICU": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ],
+    "Nursing - Medical Reports": [
+      "GET /api/auth/auto-login"
+    ],
+    "Invoice Details": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ],
+    "Clinical Care": [
+      "GET /api/auth/auto-login"
+    ],
+    "Physical Therapy": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ],
+    "Leaving Requests": [
+      "GET /api/auth/auto-login"
+    ],
+    "Surgery Bookings": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ]
+  },
+  "unique_endpoints": [
+    "GET /api/auth/auto-login",
+    "GET /api/auth/session-debug"
+  ],
+  "by_module": {
+    "auth": [
+      "GET /api/auth/auto-login",
+      "GET /api/auth/session-debug"
+    ]
+  }
+}
