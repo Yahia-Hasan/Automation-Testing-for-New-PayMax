@@ -66,12 +66,14 @@ def login_and_navigate_to_home(
     pass_input.send_keys(password)
     driver.execute_script("arguments[0].click();", btn_login)
 
-    # Step 3: Branch selection (Telerik RadComboBox)
+    # Step 3: Wait for Branch selection page
+    logger.info("Waiting for branch selection page...")
+    wait.until(
+        lambda d: "frmSelectBranch" in d.current_url or "SelectBranch" in d.current_url,
+        message="Timed out waiting for branch selection page"
+    )
+
     try:
-        wait.until(
-            lambda d: "frmSelectBranch" in d.current_url or d.find_elements(By.ID, "btnContinue"),
-            message="Waiting for branch selection page"
-        )
         driver.execute_script(f"""
             var combo = (typeof $find === 'function') ? $find('ddlBranches') : null;
             if (combo) {{
@@ -79,30 +81,31 @@ def login_and_navigate_to_home(
                 if (item) item.select();
             }}
         """)
-        time.sleep(1)
-        btn_continue = wait.until(EC.element_to_be_clickable((By.ID, "btnContinue")))
-        driver.execute_script("arguments[0].click();", btn_continue)
     except Exception as e:
-        logger.warning(f"Branch selection handled or bypassed: {e}")
+        logger.warning(f"Telerik combo selection script: {e}")
 
-    # Wait for branch postback to complete
-    try:
-        wait.until(
-            lambda d: "frmLandingPage.aspx" in d.current_url or "SelectBranch" not in d.current_url,
-            message="Waiting for postback to landing page"
-        )
-    except Exception:
-        pass
+    time.sleep(1)
+    btn_continue = wait.until(EC.element_to_be_clickable((By.ID, "btnContinue")))
+    driver.execute_script("arguments[0].click();", btn_continue)
 
-    # Step 4: Navigate to modern system
+    # Step 4: Wait for landing page and session cookies
+    logger.info("Waiting for legacy landing page...")
+    wait.until(
+        lambda d: "frmLandingPage.aspx" in d.current_url or "SelectBranch" not in d.current_url,
+        message="Waiting for postback to landing page"
+    )
+    time.sleep(2)
+
+    # Step 5: Navigate to modern system
     logger.info(f"Navigating to Modern System: {UnifiedConfig.NEW_SYSTEM_URL}")
     driver.get(UnifiedConfig.NEW_SYSTEM_URL)
 
-    # Wait for Angular hydration (top navbar)
+    # Wait for Angular URL and top navbar/layout
     wait.until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, "header.top-navbar, .navbar, [data-test-id='global-toast-stack']")),
-        message="Timed out waiting for new system UI hydration"
+        lambda d: ":4040" in d.current_url,
+        message="Timed out waiting for new system URL on port 4040"
     )
+    time.sleep(3)
     logger.info("Successfully reached modern hospital system.")
 
 

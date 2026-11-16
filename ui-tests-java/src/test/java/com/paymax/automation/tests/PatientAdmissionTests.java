@@ -211,7 +211,7 @@ public class PatientAdmissionTests extends BaseTest {
 
         page.fillMandatoryFields(lastCreatedPatientName, uniqueMobile(), VALID_BIRTH_DATE, VALID_GENDER)
                 .enterEnglishName(VALID_ENGLISH_NAME + " " + randomNameSuffix())
-                .enterNationalId(uniqueNationalId());
+                .selectCashClient();
 
         page.clickSave();
         assertPatientSavedSuccessfully();

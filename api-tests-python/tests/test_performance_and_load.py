@@ -24,7 +24,9 @@ class TestPerformanceAndLoadSuite:
         Runs Locust headless benchmark with 20 concurrent virtual hospital staff users,
         spawning at 5 users/sec, running for 25 seconds.
         """
-        locustfile = os.path.join(os.getcwd(), "locustfile.py")
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        candidate_locust = os.path.join(os.path.dirname(current_dir), "locustfile.py")
+        locustfile = candidate_locust if os.path.exists(candidate_locust) else os.path.join(os.getcwd(), "locustfile.py")
         html_report = os.path.join(os.getcwd(), "report_load_test.html")
         csv_prefix = os.path.join(os.getcwd(), "load_metrics")
 

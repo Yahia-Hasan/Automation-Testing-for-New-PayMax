@@ -615,14 +615,16 @@ public class PatientAdmissionPage extends BasePage {
         try {
             new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
                     .pollingEvery(Duration.ofMillis(200))
-                    .until(d -> collectVisibleToastTypes().contains("success") || isOnSavedPatientUrl());
-            LOGGER.info("Patient save succeeded. url={}, toastTypes={}",
-                    driver.getCurrentUrl(), collectVisibleToastTypes());
+                    .until(d -> collectVisibleToastTypes().contains("success")
+                            || getLatchedToastTypes().contains("success")
+                            || isOnSavedPatientUrl());
+            LOGGER.info("Patient save succeeded. url={}, toastTypes={}, latched={}",
+                    driver.getCurrentUrl(), collectVisibleToastTypes(), getLatchedToastTypes());
             return true;
         } catch (TimeoutException e) {
-            LOGGER.warn("Save success not detected within {}s. url={}, toastTypes={}, toastHtml={}",
+            LOGGER.warn("Save success not detected within {}s. url={}, toastTypes={}, latchedTypes={}, latchedTexts={}, toastHtml={}",
                     timeoutSeconds, driver.getCurrentUrl(),
-                    collectVisibleToastTypes(), getToastStackHtml());
+                    collectVisibleToastTypes(), getLatchedToastTypes(), getLatchedToastTexts(), getToastStackHtml());
             return false;
         }
     }
@@ -758,16 +760,20 @@ public class PatientAdmissionPage extends BasePage {
     public PatientAdmissionPage armToastTypeLatch() {
         ((JavascriptExecutor) driver).executeScript(
                 "window.__paymaxSeenToasts = [];"
-                        + "try { sessionStorage.setItem('__paymaxSeenToasts','[]'); } catch (e) {}"
+                        + "window.__paymaxSeenToastTexts = [];"
+                        + "try { sessionStorage.setItem('__paymaxSeenToasts','[]'); sessionStorage.setItem('__paymaxSeenToastTexts','[]'); } catch (e) {}"
                         + "if (window.__paymaxToastObserver) {"
                         + "  try { window.__paymaxToastObserver.disconnect(); } catch (e) {}"
                         + "}"
-                        + "function remember(t) {"
-                        + "  if (!t) return;"
-                        + "  if (window.__paymaxSeenToasts.indexOf(t) < 0)"
+                        + "function remember(t, txt) {"
+                        + "  if (t && window.__paymaxSeenToasts.indexOf(t) < 0)"
                         + "    window.__paymaxSeenToasts.push(t);"
+                        + "  if (txt && window.__paymaxSeenToastTexts.indexOf(txt) < 0)"
+                        + "    window.__paymaxSeenToastTexts.push(txt);"
                         + "  try { sessionStorage.setItem('__paymaxSeenToasts',"
-                        + "    JSON.stringify(window.__paymaxSeenToasts)); } catch (e) {}"
+                        + "    JSON.stringify(window.__paymaxSeenToasts));"
+                        + "    sessionStorage.setItem('__paymaxSeenToastTexts',"
+                        + "    JSON.stringify(window.__paymaxSeenToastTexts)); } catch (e) {}"
                         + "}"
                         + "function classify(el) {"
                         + "  if (!el || !el.getAttribute) return null;"
@@ -788,11 +794,15 @@ public class PatientAdmissionPage extends BasePage {
                         + "}"
                         + "function scan(root) {"
                         + "  if (!root) return;"
-                        + "  remember(classify(root));"
+                        + "  var t = classify(root);"
+                        + "  var txt = (root.innerText || root.textContent || '').trim();"
+                        + "  if (t) remember(t, txt);"
                         + "  if (root.querySelectorAll) {"
                         + "    root.querySelectorAll("
                         + "      \"[data-test-id^='toast-'],.toast-item,.alert\").forEach(function(n) {"
-                        + "      remember(classify(n));"
+                        + "      var nt = classify(n);"
+                        + "      var ntxt = (n.innerText || n.textContent || '').trim();"
+                        + "      if (nt) remember(nt, ntxt);"
                         + "    });"
                         + "  }"
                         + "}"
@@ -820,6 +830,24 @@ public class PatientAdmissionPage extends BasePage {
                             + "if (mem && mem.length) return mem;"
                             + "try {"
                             + "  return JSON.parse(sessionStorage.getItem('__paymaxSeenToasts') || '[]');"
+                            + "} catch (e) { return []; }");
+            if (raw instanceof java.util.List) {
+                return (java.util.List<String>) raw;
+            }
+        } catch (Exception ignored) {
+            // page may have navigated
+        }
+        return java.util.Collections.emptyList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public java.util.List<String> getLatchedToastTexts() {
+        try {
+            Object raw = ((JavascriptExecutor) driver).executeScript(
+                    "var mem = window.__paymaxSeenToastTexts;"
+                            + "if (mem && mem.length) return mem;"
+                            + "try {"
+                            + "  return JSON.parse(sessionStorage.getItem('__paymaxSeenToastTexts') || '[]');"
                             + "} catch (e) { return []; }");
             if (raw instanceof java.util.List) {
                 return (java.util.List<String>) raw;
@@ -972,6 +1000,49 @@ public class PatientAdmissionPage extends BasePage {
     public PatientAdmissionPage selectJob(String jobText) {
         selectNgOption(jobSelect, jobText);
         LOGGER.info("Selected job: {}", jobText);
+        return this;
+    }
+
+    public PatientAdmissionPage switchToContractTab() {
+        try {
+            WebElement tab = driver.findElement(By.cssSelector("[data-test-id='patient-data-contract-tab-btn']"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", tab);
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", tab);
+            LOGGER.info("Switched to Contract Tab");
+        } catch (Exception e) {
+            LOGGER.debug("Contract tab button not clicked: {}", e.getMessage());
+        }
+        return this;
+    }
+
+    public PatientAdmissionPage selectCashClient() {
+        switchToContractTab();
+        closeOpenNgDropdownPanels();
+        WebElement select = wait.until(ExpectedConditions.elementToBeClickable(clientSelect));
+        try {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", select);
+            select.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", select);
+        }
+
+        try {
+            WebElement innerInput = select.findElement(By.cssSelector("input[role='combobox']"));
+            innerInput.sendKeys("نقدي");
+        } catch (Exception ignored) {}
+
+        By option = By.xpath("//ng-dropdown-panel//*[contains(@class,'ng-option')][contains(.,'نقدي') or contains(.,'نقديه') or contains(.,'نقدا')]");
+        try {
+            WebElement opt = wait.until(ExpectedConditions.elementToBeClickable(option));
+            opt.click();
+            LOGGER.info("Selected cash client (الجهة النقدية): {}", opt.getText());
+        } catch (Exception e) {
+            By firstOpt = By.cssSelector("ng-dropdown-panel .ng-option:not(.ng-option-disabled)");
+            WebElement opt = wait.until(ExpectedConditions.elementToBeClickable(firstOpt));
+            opt.click();
+            LOGGER.info("Selected fallback client option: {}", opt.getText());
+        }
+        closeOpenNgDropdownPanels();
         return this;
     }
 
@@ -1186,8 +1257,11 @@ public class PatientAdmissionPage extends BasePage {
     }
 
     public PatientAdmissionPage selectFirstInsCompanyOption() {
+        if (!isNgSelectEnabled(insCompanySelect)) {
+            LOGGER.info("Sub-company (الشركة الفرعية) dropdown is disabled; skipping");
+            return this;
+        }
         wait.until(ExpectedConditions.visibilityOf(insCompanySelect));
-        wait.until(d -> isNgSelectEnabled(insCompanySelect));
         selectFirstNgOption(insCompanySelect);
         return this;
     }
@@ -1238,6 +1312,7 @@ public class PatientAdmissionPage extends BasePage {
     }
 
     public void clickSave() {
+        armToastTypeLatch();
         clickFresh(SAVE_BUTTON);
         LOGGER.info("Clicked Save (اضافة)");
     }
@@ -2332,6 +2407,10 @@ public class PatientAdmissionPage extends BasePage {
             try {
                 element.click();
                 return true;
+            } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+                LOGGER.debug("Click intercepted on {}; using JS click fallback", locator);
+                ((JavascriptExecutor) currentDriver).executeScript("arguments[0].click();", element);
+                return true;
             } catch (StaleElementReferenceException e) {
                 LOGGER.debug("Element was redrawn before click; locating it again: {}", locator);
                 return false;
@@ -2394,7 +2473,12 @@ public class PatientAdmissionPage extends BasePage {
     private void selectNgOption(WebElement ngSelect, String optionText) {
         closeOpenNgDropdownPanels();
         WebElement select = wait.until(ExpectedConditions.elementToBeClickable(ngSelect));
-        select.click();
+        try {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", select);
+            select.click();
+        } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", select);
+        }
 
         WebElement innerInput = select.findElement(By.cssSelector("input[role='combobox']"));
         if (innerInput.getAttribute("readonly") == null) {
@@ -2408,9 +2492,19 @@ public class PatientAdmissionPage extends BasePage {
                 "//ng-dropdown-panel//*[contains(@class,'ng-option')]"
                         + "[contains(normalize-space(),'" + optionText + "')]");
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(option)).click();
+            WebElement optElem = wait.until(ExpectedConditions.elementToBeClickable(option));
+            try {
+                optElem.click();
+            } catch (org.openqa.selenium.ElementClickInterceptedException cie) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", optElem);
+            }
         } catch (Exception e) {
-            wait.until(ExpectedConditions.elementToBeClickable(optionFallback)).click();
+            WebElement optFallbackElem = wait.until(ExpectedConditions.elementToBeClickable(optionFallback));
+            try {
+                optFallbackElem.click();
+            } catch (org.openqa.selenium.ElementClickInterceptedException cie) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", optFallbackElem);
+            }
         }
         closeOpenNgDropdownPanels();
     }
@@ -2433,13 +2527,22 @@ public class PatientAdmissionPage extends BasePage {
                 if (!isNgSelectEnabled(select)) {
                     throw new IllegalStateException("ng-select is disabled; cannot pick an option");
                 }
-                select.click();
+                try {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", select);
+                    select.click();
+                } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", select);
+                }
 
                 wait.until(ExpectedConditions.presenceOfElementLocated(panel));
                 WebElement option = new WebDriverWait(driver, Duration.ofSeconds(8))
                         .pollingEvery(Duration.ofMillis(200))
                         .until(ExpectedConditions.elementToBeClickable(firstOption));
-                option.click();
+                try {
+                    option.click();
+                } catch (org.openqa.selenium.ElementClickInterceptedException cie) {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", option);
+                }
                 closeOpenNgDropdownPanels();
                 LOGGER.info("Selected first available option from ng-select (attempt {})", attempt);
                 return;

@@ -1,51 +1,31 @@
-import os
+import sys
+from pathlib import Path
 import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from pages.legacy_login_page import LegacyLoginPage
+
+# Ensure shared utilities and local pages are resolvable
+root_dir = Path(__file__).resolve().parent.parent.parent
+shared_utils = str(root_dir / "shared" / "python-utils")
+api_python = str(root_dir / "api-tests-python")
+if shared_utils not in sys.path:
+    sys.path.insert(0, shared_utils)
+if api_python not in sys.path:
+    sys.path.insert(0, api_python)
+
+from driver_factory import create_driver
+from auth_manager import login_and_navigate_to_home
 
 @pytest.fixture(scope="session")
 def driver():
-    """
-    Session-scoped Chrome WebDriver.
-    Controls visibility with HEADLESS env var (defaults to headless=True for automated runs).
-    To see the browser live, run with: $env:HEADLESS="false"
-    """
-    is_headless = os.getenv("HEADLESS", "false").lower() in ("true", "1", "yes")
-
-    options = Options()
-    if is_headless:
-        options.add_argument("--headless=new")
-    options.add_argument("--ignore-certificate-errors")
-    options.add_argument("--allow-insecure-localhost")
-    options.add_argument("--disable-web-security")
-    options.add_argument("--start-maximized")
-    options.set_capability("acceptInsecureCerts", True)
-
-    try:
-        service = Service(ChromeDriverManager().install())
-        drv = webdriver.Chrome(service=service, options=options)
-    except Exception:
-        drv = webdriver.Chrome(options=options)
-
-    drv.maximize_window()
-
-    drv.implicitly_wait(10)
+    """Session-scoped Chrome WebDriver using shared DriverFactory."""
+    drv = create_driver()
     yield drv
     drv.quit()
 
 @pytest.fixture(scope="session")
 def auth_driver(driver):
     """
-    Navigates through the legacy login portal, selects Ad Doqi branch,
+    Authenticates through the shared AuthManager legacy login bridge
     and returns a driver ready on the modern Angular application.
     """
-    login_page = LegacyLoginPage(driver)
-    login_page.login_full_flow(
-        username="sysadmin",
-        password="Ma3an2025",
-        branch_name="Ad Doqi"
-    )
+    login_and_navigate_to_home(driver)
     return driver
