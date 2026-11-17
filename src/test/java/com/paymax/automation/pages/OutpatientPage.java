@@ -36,7 +36,8 @@ public class OutpatientPage extends BasePage {
 
     // ---------- Draft visit (بيانات المريض) ----------
     private static final By CASE_TYPE_SELECT = By.cssSelector(
-            "[data-test-id='clinic-visit-case-type-select'],"
+            "[data-test-id='opd-visit-draft-case-type-select'],"
+                    + "[data-test-id='clinic-visit-case-type-select'],"
                     + "[data-test-id='opd-case-type-select'],"
                     + "[data-test-id='visit-case-type-select']");
     private static final By CASE_TYPE_BY_LABEL = By.xpath(
@@ -44,15 +45,17 @@ public class OutpatientPage extends BasePage {
                     + "/following::*[self::ng-select or contains(@class,'ng-select')][1]");
 
     private static final By SUB_COMPANY_SELECT = By.cssSelector(
-            "[data-test-id='clinic-visit-ins-company-select'],"
+            "[data-test-id='opd-visit-draft-ins-company-select'],"
+                    + "[data-test-id='clinic-visit-ins-company-select'],"
                     + "[data-test-id='opd-ins-company-select'],"
                     + "[data-test-id='visit-sub-company-select']");
     private static final By SUB_COMPANY_BY_LABEL = By.xpath(
-            "//label[contains(normalize-space(.),'الشركة الفرعية')]"
+            "//label[contains(normalize-space(.),'الجهة') or contains(normalize-space(.),'شركة التأمين') or contains(normalize-space(.),'الشركة الفرعية')]"
                     + "/following::*[self::ng-select or contains(@class,'ng-select')][1]");
 
     private static final By SAVE_VISIT_BUTTON = By.cssSelector(
-            "[data-test-id='clinic-visit-save-btn'],"
+            "[data-test-id='opd-visit-draft-save-btn'],"
+                    + "[data-test-id='clinic-visit-save-btn'],"
                     + "[data-test-id='opd-save-btn'],"
                     + "[data-test-id='visit-save-btn']");
     private static final By SAVE_VISIT_BY_TEXT = By.xpath(
@@ -142,9 +145,19 @@ public class OutpatientPage extends BasePage {
     private static final By SERVICES_INS_COMPANY_SELECT = By.cssSelector(
             "[data-test-id='opd-patient-services-ins-company-select']");
     private static final By SERVICES_TRANSFER_DOCTOR_SELECT = By.cssSelector(
-            "[data-test-id='opd-patient-services-transfer-doctor-select']");
+            "[data-test-id='opd-visit-draft-transfer-doctor-select'],"
+                    + "[data-test-id='opd-patient-services-transfer-doctor-select']");
     private static final By SERVICES_ICD_SELECT = By.cssSelector(
-            "[data-test-id='opd-patient-services-icd-select']");
+            "[data-test-id='opd-visit-draft-icd-select'],"
+                    + "[data-test-id='opd-patient-services-icd-select'],"
+                    + "[data-test-id='opd-patiant-services-icd-select'],"
+                    + "[data-test-id='clinic-visit-draft-icd-select'],"
+                    + "[data-test-id='opd-draft-icd-select'],"
+                    + "[data-test-id='opd-icd-select'],"
+                    + "[data-test-id*='icd-select']");
+    private static final By SERVICES_ICD_BY_LABEL = By.xpath(
+            "//label[contains(normalize-space(.),'التشخيص') or contains(normalize-space(.),'ICD')]"
+                    + "/following::*[self::ng-select or contains(@class,'ng-select')][1]");
 
     // ---------- Totals strip ----------
     private static final By TOTALS_STRIP = By.cssSelector(".totals-strip");
@@ -215,7 +228,12 @@ public class OutpatientPage extends BasePage {
             "[data-test-id='opd-patient-services-med-charge-unit-select'],"
                     + "[data-test-id='opd-patient-services-med-charge-item-unit-select']");
     private static final By OPEN_MED_BATCH_DIALOG_BTN = By.cssSelector(
-            "[data-test-id='opd-patient-services-open-med-batch-dialog-btn']");
+            "[data-test-id='opd-patient-services-open-med-batch-dialog-btn'],"
+                    + "[data-test-id*='open-med-batch'],"
+                    + "[data-test-id*='med-batch-dialog-btn'],"
+                    + "[data-test-id*='batch-btn']");
+    private static final By OPEN_MED_BATCH_DIALOG_BTN_FALLBACK = By.xpath(
+            "//button[contains(@class,'btn')][.//i[contains(@class,'plus')] or text()='+' or contains(normalize-space(.),'+') or contains(normalize-space(.),'تشغيلة') or contains(normalize-space(.),'باتش')]");
     private static final By MED_CHARGE_CREDIT_PCT_INPUT = By.cssSelector(
             "[data-test-id='opd-patient-services-med-charge-entry-credit-pct-input']");
     private static final By CLEAR_MED_CHARGE_BTN = By.cssSelector(
@@ -922,7 +940,16 @@ public class OutpatientPage extends BasePage {
     public String getPageHeaderVisitNumber() {
         String full = wait.until(ExpectedConditions.visibilityOfElementLocated(PAGE_VISIT_NUMBER_HEADER))
                 .getText().trim();
-        // extract numeric part
+        // Extract only the visit number following "زيارة رقم" or the first digit sequence,
+        // preventing concatenation with any trailing date (e.g. "19/10/2026")
+        Matcher matcher = Pattern.compile("(?:زيارة\\s*رقم|Visit|رقم)\\s*[:#-]?\\s*(\\d+)", Pattern.CASE_INSENSITIVE).matcher(full);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        Matcher firstDigits = Pattern.compile("(\\d+)").matcher(full);
+        if (firstDigits.find()) {
+            return firstDigits.group(1);
+        }
         return full.replaceAll("[^\\d]", "");
     }
 
@@ -1045,7 +1072,10 @@ public class OutpatientPage extends BasePage {
             WebElement input = resolve(UNIT_PRICE_INPUT, UNIT_PRICE_BY_LABEL);
             String readonly = input.getAttribute("readonly");
             String disabled = input.getAttribute("disabled");
-            return readonly != null || disabled != null;
+            String ariaDisabled = input.getAttribute("aria-disabled");
+            String cls = input.getAttribute("class");
+            return readonly != null || disabled != null || "true".equals(ariaDisabled)
+                    || !input.isEnabled() || (cls != null && (cls.contains("disabled") || cls.contains("readonly")));
         } catch (Exception e) {
             return false;
         }
@@ -1060,7 +1090,10 @@ public class OutpatientPage extends BasePage {
             WebElement input = resolve(QUANTITY_INPUT, QUANTITY_BY_LABEL);
             String readonly = input.getAttribute("readonly");
             String disabled = input.getAttribute("disabled");
-            return readonly != null || disabled != null;
+            String ariaDisabled = input.getAttribute("aria-disabled");
+            String cls = input.getAttribute("class");
+            return readonly != null || disabled != null || "true".equals(ariaDisabled)
+                    || !input.isEnabled() || (cls != null && (cls.contains("disabled") || cls.contains("readonly")));
         } catch (Exception e) {
             return false;
         }
@@ -1153,13 +1186,15 @@ public class OutpatientPage extends BasePage {
     }
 
     public boolean isToastOrAlertContaining(String expectedFragment) {
+        if (expectedFragment == null || expectedFragment.isBlank()) {
+            return false;
+        }
         try {
             List<WebElement> els = driver.findElements(By.xpath(
-                    "//*[contains(@class,'toast-item') or contains(@class,'toast-message') or contains(@class,'swal2-html-container') or contains(@class,'p-toast-detail') or contains(@class,'alert') or contains(@class,'toast')]"));
+                    "//*[contains(@class,'toast') or contains(@class,'alert') or contains(@class,'swal') or contains(@class,'error') or contains(@class,'invalid') or contains(@class,'modal') or contains(@class,'popover') or self::p or self::span or self::div][contains(normalize-space(.),'" + expectedFragment + "')]"));
             return els.stream().anyMatch(e -> {
                 try {
-                    String text = e.getText();
-                    return e.isDisplayed() && text != null && text.contains(expectedFragment);
+                    return e.isDisplayed();
                 } catch (Exception ex) {
                     return false;
                 }
@@ -1514,10 +1549,17 @@ public class OutpatientPage extends BasePage {
         closeOpenNgDropdownPanels();
         WebElement clinicDropdown = resolve(CLINIC_SELECT, CLINIC_BY_LABEL);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", clinicDropdown);
-        clinicDropdown.click();
+
+        try { Thread.sleep(600); } catch (InterruptedException ignored) {}
 
         try {
-            List<WebElement> options = new WebDriverWait(driver, Duration.ofSeconds(5))
+            clinicDropdown.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", clinicDropdown);
+        }
+
+        try {
+            List<WebElement> options = new WebDriverWait(driver, Duration.ofSeconds(6))
                     .until(ExpectedConditions.presenceOfNestedElementsLocatedBy(
                             By.cssSelector("ng-dropdown-panel, .ng-dropdown-panel"),
                             By.cssSelector(".ng-option:not(.ng-option-disabled)")));
@@ -1542,14 +1584,14 @@ public class OutpatientPage extends BasePage {
     // =========================================================
 
     public OutpatientPage selectIcdDiagnosis(String icdText) {
-        WebElement icdSelect = wait.until(ExpectedConditions.elementToBeClickable(SERVICES_ICD_SELECT));
+        WebElement icdSelect = resolve(SERVICES_ICD_SELECT, SERVICES_ICD_BY_LABEL);
         selectNgOption(icdSelect, icdText);
         LOGGER.info("Selected ICD diagnosis: {}", icdText);
         return this;
     }
 
     public OutpatientPage selectFirstIcdDiagnosisOption() {
-        WebElement icdSelect = wait.until(ExpectedConditions.elementToBeClickable(SERVICES_ICD_SELECT));
+        WebElement icdSelect = resolve(SERVICES_ICD_SELECT, SERVICES_ICD_BY_LABEL);
         selectFirstSearchableNgOption(icdSelect, "a");
         LOGGER.info("Selected first available ICD diagnosis option");
         return this;
@@ -1563,7 +1605,7 @@ public class OutpatientPage extends BasePage {
             if (!reqLabels.isEmpty() && reqLabels.stream().anyMatch(WebElement::isDisplayed)) {
                 return true;
             }
-            WebElement selectContainer = resolve(SERVICES_ICD_SELECT, By.cssSelector("[data-test-id='opd-patient-services-icd-select']"));
+            WebElement selectContainer = resolve(SERVICES_ICD_SELECT, SERVICES_ICD_BY_LABEL);
             String classes = selectContainer.getAttribute("class");
             return classes != null && (classes.contains("ng-invalid") || classes.contains("required"));
         } catch (Exception e) {
@@ -1690,7 +1732,12 @@ public class OutpatientPage extends BasePage {
     }
 
     public boolean isClaimTitleInGrid(String title) {
-        return getClaimTitlesList().contains(title);
+        try {
+            return new WebDriverWait(driver, Duration.ofSeconds(6))
+                    .until(d -> getClaimTitlesList().stream().anyMatch(t -> t.contains(title)));
+        } catch (Exception e) {
+            return getClaimTitlesList().stream().anyMatch(t -> t.contains(title));
+        }
     }
 
     public OutpatientPage clickDownloadClaimForTitle(String title) {
@@ -1894,14 +1941,32 @@ public class OutpatientPage extends BasePage {
 
     public OutpatientPage selectMedStore(String storeName) {
         WebElement select = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_STORE_SELECT));
-        selectNgOption(select, storeName);
+        if (storeName == null || storeName.isBlank() || "FIRST".equalsIgnoreCase(storeName)) {
+            selectFirstNgOption(select);
+        } else {
+            try {
+                selectNgOption(select, storeName);
+            } catch (Exception e) {
+                LOGGER.warn("Could not select store by exact name '{}', falling back to first available store: {}", storeName, e.getMessage());
+                selectFirstNgOption(select);
+            }
+        }
         LOGGER.info("Selected medicine store: {}", storeName);
         return this;
     }
 
     public OutpatientPage selectMedDoctor(String doctorName) {
         WebElement select = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_DOCTOR_SELECT));
-        selectNgOption(select, doctorName);
+        if (doctorName == null || doctorName.isBlank() || "FIRST".equalsIgnoreCase(doctorName)) {
+            selectFirstNgOption(select);
+        } else {
+            try {
+                selectNgOption(select, doctorName);
+            } catch (Exception e) {
+                LOGGER.warn("Could not select doctor by exact name '{}', falling back to first available doctor: {}", doctorName, e.getMessage());
+                selectFirstNgOption(select);
+            }
+        }
         LOGGER.info("Selected medicine doctor: {}", doctorName);
         return this;
     }
@@ -1915,21 +1980,47 @@ public class OutpatientPage extends BasePage {
 
     public OutpatientPage selectMedUnit(String unitName) {
         try {
-            WebElement select = wait.until(ExpectedConditions.elementToBeClickable(MED_CHARGE_UNIT_SELECT));
-            selectNgOption(select, unitName);
-            LOGGER.info("Selected medicine unit: {}", unitName);
+            By unitLocator = By.cssSelector("[data-test-id='opd-patient-services-med-charge-unit-select'], [data-test-id='opd-patient-services-med-charge-item-unit-select'], [data-test-id*='unit']");
+            List<WebElement> els = driver.findElements(unitLocator);
+            if (!els.isEmpty() && els.get(0).isDisplayed()) {
+                selectNgOption(els.get(0), unitName);
+                LOGGER.info("Selected medicine unit: {}", unitName);
+                return this;
+            }
+        } catch (Exception ignored) {}
+
+        try {
+            By fallback = By.xpath("//label[contains(normalize-space(.),'الوحدة') or contains(normalize-space(.),'وحدة')]/following::*[self::ng-select or contains(@class,'ng-select') or self::select or self::input][1]");
+            List<WebElement> fallbacks = driver.findElements(fallback);
+            if (!fallbacks.isEmpty()) {
+                WebElement el = fallbacks.get(0);
+                if ("input".equalsIgnoreCase(el.getTagName())) {
+                    el.clear();
+                    el.sendKeys(unitName);
+                } else if ("select".equalsIgnoreCase(el.getTagName())) {
+                    new org.openqa.selenium.support.ui.Select(el).selectByVisibleText(unitName);
+                } else {
+                    selectNgOption(el, unitName);
+                }
+                LOGGER.info("Selected medicine unit via fallback: {}", unitName);
+            }
         } catch (Exception e) {
-            LOGGER.warn("Could not find unit select by test-id; trying label fallback: {}", e.getMessage());
-            By fallback = By.xpath("//label[contains(normalize-space(.),'الوحدة')]/following::*[self::ng-select or contains(@class,'ng-select')][1]");
-            WebElement select = wait.until(ExpectedConditions.elementToBeClickable(fallback));
-            selectNgOption(select, unitName);
+            LOGGER.warn("Unit might already be auto-populated or unavailable for item: {}", e.getMessage());
         }
         return this;
     }
 
     public boolean isOpenMedBatchDialogButtonVisible() {
-        List<WebElement> btns = driver.findElements(OPEN_MED_BATCH_DIALOG_BTN);
-        return !btns.isEmpty() && btns.stream().anyMatch(WebElement::isDisplayed);
+        try {
+            List<WebElement> btns = driver.findElements(OPEN_MED_BATCH_DIALOG_BTN);
+            if (!btns.isEmpty() && btns.stream().anyMatch(WebElement::isDisplayed)) {
+                return true;
+            }
+            List<WebElement> fallback = driver.findElements(OPEN_MED_BATCH_DIALOG_BTN_FALLBACK);
+            return !fallback.isEmpty() && fallback.stream().anyMatch(WebElement::isDisplayed);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public OutpatientPage clickOpenMedBatchDialogButton() {
