@@ -1,0 +1,522 @@
+[
+  {
+    "text": "PayMax",
+    "href": "http://196.218.246.250/sysAdmin/Home/frmLandingPage.aspx"
+  },
+  {
+    "text": "الملف الطبى",
+    "href": "/reception"
+  },
+  {
+    "text": "تقرير إشغال المستشفى",
+    "href": "/reception/occupancy-report"
+  },
+  {
+    "text": "تقرير الدخول والخروج",
+    "href": "/reception/admission-discharge-report"
+  },
+  {
+    "text": "حجز العمليات",
+    "href": "/reception/surgery-booking"
+  },
+  {
+    "text": "المرضى الداخلي قيد الخروج",
+    "href": "/waiting-list/leaving-requests"
+  },
+  {
+    "text": "طلبات خروج المرضى",
+    "href": "/accountant/leaving-requests"
+  },
+  {
+    "text": "طلبات تحويل المرضى من الطوارئ",
+    "href": "/reception/emergency-transfers"
+  },
+  {
+    "text": "تقرير تأكيد طلبات المغادرة",
+    "href": "/reception/leaving-approval-report"
+  },
+  {
+    "text": "بيانات الأطباء",
+    "href": "/info-desk/doctors"
+  },
+  {
+    "text": "بيانات مسؤولين الشيفت",
+    "href": "/info-desk/shift-managers"
+  },
+  {
+    "text": "قوائم الأسعار",
+    "href": "/info-desk/price-lists"
+  },
+  {
+    "text": "أسماء العمليات",
+    "href": "/info-desk/surgery-names"
+  },
+  {
+    "text": "أسعار العمليات",
+    "href": "/info-desk/surgery-prices"
+  },
+  {
+    "text": "أجندة العمليات",
+    "href": "/info-desk/surgery-agenda"
+  },
+  {
+    "text": "أجندة العيادات",
+    "href": "/info-desk/clinic-agenda"
+  },
+  {
+    "text": "دليل الهاتف",
+    "href": "/info-desk/phone-book"
+  },
+  {
+    "text": "قائمة انتظار العمليات",
+    "href": "/info-desk/surgeries"
+  },
+  {
+    "text": "استعلام عن الباكيدجات",
+    "href": "/info-desk/packages"
+  },
+  {
+    "text": "المرضى بالغرف",
+    "href": "/reception/inpatients"
+  },
+  {
+    "text": "المرضى بالرعاية المركزة",
+    "href": "/reception/icu"
+  },
+  {
+    "text": "المرضى بالحضانة",
+    "href": "/reception/neonatal"
+  },
+  {
+    "text": "مرافقو المرضى",
+    "href": "/reception/attendants"
+  },
+  {
+    "text": "إدارة الغرف",
+    "href": "/reception/room-management"
+  },
+  {
+    "text": "إشغال الغرف (خريطة)",
+    "href": "/reception/rooms"
+  },
+  {
+    "text": "قائمة انتظار الأشعة",
+    "href": "/rays/waiting-list"
+  },
+  {
+    "text": "موقف تنفيذ حالات الأشعة وطباعة الاستيكر",
+    "href": "/rays/status"
+  },
+  {
+    "text": "تقرير تفصيلي بالأشعة",
+    "href": "/rays/details"
+  },
+  {
+    "text": "قائمة انتظار التحاليل",
+    "href": "/lab/waiting-list"
+  },
+  {
+    "text": "قائمة انتظار بنك الدم",
+    "href": "/lab/blood-waiting-list"
+  },
+  {
+    "text": "تقرير بالتحاليل التفصيلي",
+    "href": "/lab/details"
+  },
+  {
+    "text": "استعلام عن بنك الدم",
+    "href": "/lab/blood-bank-status"
+  },
+  {
+    "text": "استعلام عن نتائج التحاليل",
+    "href": "/lab/results-inquiry"
+  },
+  {
+    "text": "قائمة انتظار العلاج الطبيعي",
+    "href": "/physical-therapy/waiting-list"
+  },
+  {
+    "text": "كشوف الحساب المفتوحة",
+    "href": "/patient-accounts/unregistered-invoices"
+  },
+  {
+    "text": "فواتير المرضى",
+    "href": "/patient-accounts/registered-invoices"
+  },
+  {
+    "text": "حسابات المرضى الداخلي",
+    "href": "/patient-accounts/patient-checkups"
+  },
+  {
+    "text": "مديونيات المرضى",
+    "href": "/patient-accounts/patient-settlements"
+  },
+  {
+    "text": "بنك الفنيين",
+    "href": "/patient-accounts/technician-bank"
+  },
+  {
+    "text": "دمج بين المرضى",
+    "href": "/patient-accounts/merge-patients"
+  },
+  {
+    "text": "المرضى بالغرف",
+    "href": "/waiting-list/accomodation-rooms"
+  },
+  {
+    "text": "المرضى بالرعاية المركزة",
+    "href": "/waiting-list/icu"
+  },
+  {
+    "text": "المرضى بالحضانة",
+    "href": "/waiting-list/neonatal"
+  },
+  {
+    "text": "قائمة طلبات الأنظمة الغذائية للمرضي",
+    "href": "/waiting-list/patient-diets-list"
+  },
+  {
+    "text": "قائمة طلبات الأنظمة الغذائية للمرافقين",
+    "href": "/waiting-list/attendant-diets"
+  },
+  {
+    "text": "التقارير الطبية للمرضى الداخلي",
+    "href": "/waiting-list/medical-reports"
+  },
+  {
+    "text": "قائمة انتظار العيادات",
+    "href": "/clinic/waiting-list"
+  },
+  {
+    "text": "تقرير العيادات التفصيلي",
+    "href": "/clinic/visit-details-report"
+  },
+  {
+    "text": "المرضى بالعيادات",
+    "href": "/clinic/patients"
+  },
+  {
+    "text": "تعديل زيارة عيادات",
+    "href": "/clinic/edit-visit"
+  },
+  {
+    "text": "إلغاء خروج مريض عيادات مُغلقة",
+    "href": "/clinic/cancel-leaved-visit"
+  },
+  {
+    "text": "التقارير الطبية للعيادات الخارجية",
+    "href": "/clinic/medical-reports"
+  },
+  {
+    "text": "المرضى بالطوارئ",
+    "href": "/emergency/waiting-list"
+  },
+  {
+    "text": "تعديل زيارة بالطوارئ",
+    "href": "/emergency/edit-visit"
+  },
+  {
+    "text": "تقرير الدخول والخروج بالطوارئ",
+    "href": "/emergency/admission-discharge-report"
+  },
+  {
+    "text": "التقارير الطبية للإسعاف والطوارئ",
+    "href": "/emergency/medical-reports"
+  },
+  {
+    "text": "تقرير اشغال أسرة الطوارئ",
+    "href": "/emergency/bed-occupancy"
+  },
+  {
+    "text": "إلغاء خروج مريض طوارئ تم إغلاقها",
+    "href": "/emergency/cancel-leaved"
+  },
+  {
+    "text": "كل تقارير المبيعات",
+    "href": "/reports/sales"
+  },
+  {
+    "text": "مبيعات العيادات",
+    "href": "/reports/clinic-sales-in-period"
+  },
+  {
+    "text": "مبيعات الطوارئ التفصيلي",
+    "href": "/reports/emergency-services-sales"
+  },
+  {
+    "text": "مبيعات طوارئ المستشفى",
+    "href": "/reports/hospital-emergency-sales"
+  },
+  {
+    "text": "مبيعات العيادات اجمالى",
+    "href": "/reports/opd-sales-report"
+  },
+  {
+    "text": "مبيعات الداخلى تفصيلى",
+    "href": "/reports/accommodation-class-checkup"
+  },
+  {
+    "text": "مبيعات الداخلى اجمالى",
+    "href": "/reports/acc-class-checkup-totals"
+  },
+  {
+    "text": "ربحية حالات الداخلي",
+    "href": "/reports/ipd-case-profitability"
+  },
+  {
+    "text": "مبيعات الداخلي باكدج",
+    "href": "/reports/checkup-with-package"
+  },
+  {
+    "text": "كل التقارير التحليلية",
+    "href": "/reports/analytical"
+  },
+  {
+    "text": "تقرير عمليات المرضى",
+    "href": "/reports/surgery-with-tax-total"
+  },
+  {
+    "text": "خدمات المستشفى والأجهزة",
+    "href": "/reports/hospital-services-devices"
+  },
+  {
+    "text": "إيرادات الداخلي / العناية المركزة",
+    "href": "/reports/ipd-icu-revenue"
+  },
+  {
+    "text": "إجمالي إيرادات المستشفى - مفصل",
+    "href": "/reports/detailed-hospital-revenue"
+  },
+  {
+    "text": "إجمالي إيرادات المستشفى",
+    "href": "/reports/hospital-revenue-comparison"
+  },
+  {
+    "text": "خدمات العمليات بالنوع",
+    "href": "/reports/surgery-services-by-type"
+  },
+  {
+    "text": "خدمات الاقامة بالنوع",
+    "href": "/reports/accommodation-services-by-type"
+  },
+  {
+    "text": "إجمالي الإيراد بالتخصص والطبيب",
+    "href": "/reports/doctors-departments-revenue"
+  },
+  {
+    "text": "مرتبات الأطباء عن عمليات (داخلي)",
+    "href": "/reports/doctor-inpatient-surgery-salaries"
+  },
+  {
+    "text": "مرتبات اطباء العيادات",
+    "href": "/reports/opd-doctors-specialty-revenue"
+  },
+  {
+    "text": "أتعاب الأطباء (عيادات + عمليات)",
+    "href": "/reports/doctors-clinics-surgeries-fees"
+  },
+  {
+    "text": "إجمالي الإيراد بالحالة (مسجلة)",
+    "href": "/reports/revenue-billed-by-case"
+  },
+  {
+    "text": "إجمالي الإيراد بالحالة (غير مسجلة)",
+    "href": "/reports/revenue-unbilled-by-case"
+  },
+  {
+    "text": "أتعاب طبيب",
+    "href": "/reports/doctor-fees"
+  },
+  {
+    "text": "أتعاب مرور الاستشاريين",
+    "href": "/reports/doctor-fees-supervisors"
+  },
+  {
+    "text": "عمليات طبيب",
+    "href": "/reports/doctor-surgeries"
+  },
+  {
+    "text": "مطالبات خدمات جهة",
+    "href": "/reports/client-obtained-services"
+  },
+  {
+    "text": "الخدمات حسب التخصص",
+    "href": "/reports/specialist-obtained-services"
+  },
+  {
+    "text": "حركات الخزينة",
+    "href": "/reports/income-in-duration"
+  },
+  {
+    "text": "المصروفات خلال فترة",
+    "href": "/reports/expenses-in-duration"
+  },
+  {
+    "text": "الإقامة خلال فترة",
+    "href": "/reports/accommodation-in-duration"
+  },
+  {
+    "text": "تسويات الأطباء",
+    "href": "/reports/doctors-settlements"
+  },
+  {
+    "text": "إقامات المريض داخل المستشفى",
+    "href": "/reports/patient-transferring-accommodation"
+  },
+  {
+    "text": "تقرير بالعمليات خلال فترة",
+    "href": "/reports/surgeries-in-period"
+  },
+  {
+    "text": "خدمات المرضى خلال فترة",
+    "href": "/reports/services-patients"
+  },
+  {
+    "text": "تحليل الايرادات الطوارئ خلال فترة",
+    "href": "/reports/balance-clinic-external-period"
+  },
+  {
+    "text": "تحليل الايرادات الخارجي خلال فترة",
+    "href": "/reports/balance-clinic-external-patients"
+  },
+  {
+    "text": "اجمالى على مستوى العياده",
+    "href": "/reports/total-invoice-by-clinic"
+  },
+  {
+    "text": "اجمالى على مستوى الطبيب",
+    "href": "/reports/total-invoice-by-doctor"
+  },
+  {
+    "text": "الخدمات المحذوفة لمريض",
+    "href": "/reports/deleted-patient-services"
+  },
+  {
+    "text": "الايرادات والمصروفات اليوميه",
+    "href": "/reports/daily-balance-clinic"
+  },
+  {
+    "text": "مرور الاشراف الطبى",
+    "href": "/reports/supervisor-medical-pass"
+  },
+  {
+    "text": "تقرير بخروج المرضى",
+    "href": "/reports/patients-leave-reasons"
+  },
+  {
+    "text": "تقرير تفصيلي بالخدمات والمستلزمات الطبية",
+    "href": "/reports/services-medical-supplies"
+  },
+  {
+    "text": "تقرير باستهلاك الاجهزة",
+    "href": "/reports/used-devices"
+  },
+  {
+    "text": "تقرير باستهلاك الغازات",
+    "href": "/reports/used-surgery-gases"
+  },
+  {
+    "text": "الخدمات بنوع الخروج",
+    "href": "/reports/services-by-leave-type"
+  },
+  {
+    "text": "الدخول خلال فترة",
+    "href": "/reports/entrance-patients"
+  },
+  {
+    "text": "فواتير الداخلى خلال فتره",
+    "href": "/reports/internal-invoices"
+  },
+  {
+    "text": "فواتير الطوارئ خلال فتره",
+    "href": "/reports/emergency-invoices"
+  },
+  {
+    "text": "بنود الفواتير الداخلى",
+    "href": "/reports/internal-invoice-line-codes"
+  },
+  {
+    "text": "تقرير العمليات المؤجلة / الملغاه",
+    "href": "/reports/cancelled-delayed-surgeries"
+  },
+  {
+    "text": "تقرير بمدفوعات المرضى",
+    "href": "/reports/patient-payment-orders"
+  },
+  {
+    "text": "تقرير بتعديلات بيانات المرضى",
+    "href": "/reports/patient-data-changes"
+  },
+  {
+    "text": "تقرير بخصومات الفواتير",
+    "href": "/reports/inpatient-invoice-discounts"
+  },
+  {
+    "text": "تغييرات درجات العمليات",
+    "href": "/reports/surgery-degree-changes"
+  },
+  {
+    "text": "النظام الغذائى لمريض",
+    "href": "/reports/patient-diet-list"
+  },
+  {
+    "text": "تغييرات الاقامة خلال فترة",
+    "href": "/reports/accommodation-degree-changes"
+  },
+  {
+    "text": "تقرير بخصومات العيادات",
+    "href": "/reports/clinic-discounts"
+  },
+  {
+    "text": "تقرير بيانات المرضى",
+    "href": "/reports/patient-data-search"
+  },
+  {
+    "text": "تقرير تشخيصات المرضى",
+    "href": "/reports/clinic-diagnoses-search"
+  },
+  {
+    "text": "تقرير المرافقين",
+    "href": "/reports/attendants-report"
+  },
+  {
+    "text": "صافى الادويه لمريض",
+    "href": "/reports/reservation-waiting-list"
+  },
+  {
+    "text": "تقرير وجبات المرضي",
+    "href": "/reports/patient-meals-report"
+  },
+  {
+    "text": "تقرير زيارات المستشفي خلال فترة",
+    "href": "/reports/hospital-sob-visits"
+  },
+  {
+    "text": "تقرير بعدد حالات العيادات",
+    "href": "/reports/clinics-case-count"
+  },
+  {
+    "text": "تفاصيل الخصومات خلال فترة",
+    "href": "/reports/clinic-discount-analysis"
+  },
+  {
+    "text": "المرضى بالغرفمتابعة المرضى المقيمين بالغرف",
+    "href": "/reception/inpatients"
+  },
+  {
+    "text": "ملف مريضالبحث وعرض ملفات المرضى",
+    "href": "/reception"
+  },
+  {
+    "text": "فواتير المرضىإدارة فواتير المرضى",
+    "href": "/accountant/invoices"
+  },
+  {
+    "text": "المرضى بالطوارئقائمة انتظار ومتابعة حالات الطوارئ",
+    "href": "/emergency/waiting-list"
+  },
+  {
+    "text": "المرضى بالعياداتمتابعة المرضى في العيادات الخارجية",
+    "href": "/clinic/patients"
+  }
+]

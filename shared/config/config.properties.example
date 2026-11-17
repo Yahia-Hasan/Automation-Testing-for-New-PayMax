@@ -1,0 +1,16 @@
+browser=chrome
+base.url=https://YOUR_HOST:4040
+implicit.wait=0
+explicit.wait=15
+
+# Legacy login bridge settings
+legacy.login.url=http://YOUR_HOST/sysadmin/login.aspx?macAdd=000000000000
+legacy.username=YOUR_USERNAME
+legacy.password=YOUR_PASSWORD
+legacy.branch=Ad Doqi
+legacy.branch.page.url=http://YOUR_HOST/sysAdmin/Home/frmSelectBranch.aspx
+legacy.landing.url=http://YOUR_HOST/sysAdmin/Home/frmLandingPage.aspx
+new.system.url=https://YOUR_HOST:4040
+
+# Backend API
+api.base.url=https://YOUR_HOST:4040/Patients-Modern-BE

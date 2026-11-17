@@ -1,19 +1,49 @@
+# ==========================================
+# UNIFIED PAYMAX AUTOMATION FRAMEWORK GITIGNORE
+# ==========================================
+
+# Sensitive Configurations & Credentials
+shared/config/.env
+.env
+.env.*
+!.env.example
+shared/config/config.properties
+ui-tests-java/src/test/resources/config.properties
+
+# Token Caches & Session Data
+*token*.json
+*session*.json
+session.json
+shared/config/session.json
+.cache/
+
+# Java & Build Output
 target/
 test-output/
+*.class
 .tools/
 .idea/
 *.iml
 .classpath
 .project
 .settings/
-*.log
-.DS_Store
-Thumbs.db
 
-# Secrets — copy from config.example.properties locally
-src/test/resources/config.properties
-
-# Python cache
+# Python Cache & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+venv/
+.venv/
+env/
+
+# Test Reports, Screenshots & HTML Artifacts
+report.html
+report_*.html
+*.html
+*.png
+*.log
+
+# OS Metadata
+.DS_Store
+Thumbs.db

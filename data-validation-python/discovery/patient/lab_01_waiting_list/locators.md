@@ -1,0 +1,24 @@
+# محددات عناصر صفحة: قائمة انتظار التحاليل (Locators)
+
+- **المسار (Route):** `/lab/waiting-list`
+- **المكون (Angular Component):** `<app-lab-waiting-list>`
+- **إجمالي عناصر test-id المكتشفة:** `14`
+
+---
+
+| # | اسم العنصر | الأولوية الأولى (`test-id`) | أفضل بديل (CSS Selector) | محدد XPath الاحتياطي | نوع الحقل |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | **global-toast-stack** | `[test-id="global-toast-stack"]` | `div[data-test-id='global-toast-stack'], div[test-id='global-toast-stack']` | `//div[@test-id='global-toast-stack' or @data-test-id='global-toast-stack']` | `div ()` |
+| 2 | **lab-waiting-list-from-date-input** | `[test-id="lab-waiting-list-from-date-input"]` | `input[data-test-id='lab-waiting-list-from-date-input'], input[test-id='lab-waiting-list-from-date-input']` | `//input[@test-id='lab-waiting-list-from-date-input' or @data-test-id='lab-waiting-list-from-date-input']` | `input (date)` |
+| 3 | **lab-waiting-list-to-date-input** | `[test-id="lab-waiting-list-to-date-input"]` | `input[data-test-id='lab-waiting-list-to-date-input'], input[test-id='lab-waiting-list-to-date-input']` | `//input[@test-id='lab-waiting-list-to-date-input' or @data-test-id='lab-waiting-list-to-date-input']` | `input (date)` |
+| 4 | **الكلمدفوعغير مدفوع** | `[test-id="lab-waiting-list-payment-status-select"]` | `select[data-test-id='lab-waiting-list-payment-status-select'], select[test-id='lab-waiting-list-payment-status-select']` | `//select[@test-id='lab-waiting-list-payment-status-select' or @data-test-id='lab-waiting-list-payment-status-select']` | `select ()` |
+| 5 | **الكلداخليطوارئخارجيICU** | `[test-id="lab-waiting-list-patient-category-select"]` | `select[data-test-id='lab-waiting-list-patient-category-select'], select[test-id='lab-waiting-list-patient-category-select']` | `//select[@test-id='lab-waiting-list-patient-category-select' or @data-test-id='lab-waiting-list-patient-category-select']` | `select ()` |
+| 6 | **الكل** | `[test-id="lab-waiting-list-service-select"]` | `ng-select[data-test-id='lab-waiting-list-service-select'], ng-select[test-id='lab-waiting-list-service-select']` | `//ng-select[@test-id='lab-waiting-list-service-select' or @data-test-id='lab-waiting-list-service-select']` | `ng-select ()` |
+| 7 | **الكل** | `[test-id="lab-waiting-list-external-lab-select"]` | `ng-select[data-test-id='lab-waiting-list-external-lab-select'], ng-select[test-id='lab-waiting-list-external-lab-select']` | `//ng-select[@test-id='lab-waiting-list-external-lab-select' or @data-test-id='lab-waiting-list-external-lab-select']` | `ng-select ()` |
+| 8 | **استعلام** | `[test-id="lab-waiting-list-search-btn"]` | `button[data-test-id='lab-waiting-list-search-btn'], button[test-id='lab-waiting-list-search-btn']` | `//button[@test-id='lab-waiting-list-search-btn' or @data-test-id='lab-waiting-list-search-btn']` | `button ()` |
+| 9 | **lab-waiting-list-new-checkbox** | `[test-id="lab-waiting-list-new-checkbox"]` | `input[data-test-id='lab-waiting-list-new-checkbox'], input[test-id='lab-waiting-list-new-checkbox']` | `//input[@test-id='lab-waiting-list-new-checkbox' or @data-test-id='lab-waiting-list-new-checkbox']` | `input (checkbox)` |
+| 10 | **lab-waiting-list-received-checkbox** | `[test-id="lab-waiting-list-received-checkbox"]` | `input[data-test-id='lab-waiting-list-received-checkbox'], input[test-id='lab-waiting-list-received-checkbox']` | `//input[@test-id='lab-waiting-list-received-checkbox' or @data-test-id='lab-waiting-list-received-checkbox']` | `input (checkbox)` |
+| 11 | **lab-waiting-list-delivered-checkbox** | `[test-id="lab-waiting-list-delivered-checkbox"]` | `input[data-test-id='lab-waiting-list-delivered-checkbox'], input[test-id='lab-waiting-list-delivered-checkbox']` | `//input[@test-id='lab-waiting-list-delivered-checkbox' or @data-test-id='lab-waiting-list-delivered-checkbox']` | `input (checkbox)` |
+| 12 | **lab-waiting-list-approved-checkbox** | `[test-id="lab-waiting-list-approved-checkbox"]` | `input[data-test-id='lab-waiting-list-approved-checkbox'], input[test-id='lab-waiting-list-approved-checkbox']` | `//input[@test-id='lab-waiting-list-approved-checkbox' or @data-test-id='lab-waiting-list-approved-checkbox']` | `input (checkbox)` |
+| 13 | **بحث...** | `[test-id="lab-waiting-list-search-input"]` | `input[data-test-id='lab-waiting-list-search-input'], input[test-id='lab-waiting-list-search-input']` | `//input[@test-id='lab-waiting-list-search-input' or @data-test-id='lab-waiting-list-search-input']` | `input (text)` |
+| 14 | **تصدير إلى إكسيل** | `[test-id="lab-waiting-list-export-btn"]` | `button[data-test-id='lab-waiting-list-export-btn'], button[test-id='lab-waiting-list-export-btn']` | `//button[@test-id='lab-waiting-list-export-btn' or @data-test-id='lab-waiting-list-export-btn']` | `button ()` |

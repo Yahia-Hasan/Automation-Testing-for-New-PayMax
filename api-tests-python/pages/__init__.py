@@ -1,0 +1,1 @@
+# BayMax UI Page Objects
